@@ -7,6 +7,7 @@ import {
   AlunoDiv,
   ButtonsDiv,
   Container,
+  CopyText,
   DownloadButton,
   InputFileReceiver,
   MainDiv,
@@ -41,14 +42,6 @@ export default function Home() {
   return (
     <MainDiv>
       <ButtonsDiv>
-        <DownloadButton
-          disabled={SelectedStudents.length == 0}
-          onClick={() => {
-            downloadCsv();
-          }}
-        >
-          Download CSV
-        </DownloadButton>
         <InputFileReceiver>
           <p>Selecione o arquivo</p>
           <input
@@ -153,6 +146,35 @@ export default function Home() {
             }}
           />
         </InputFileReceiver>
+        <DownloadButton
+          disabled={SelectedStudents.length == 0}
+          onClick={() => {
+            downloadCsv();
+          }}
+        >
+          Download CSV
+        </DownloadButton>
+        <CopyText
+          onClick={() => {
+            navigator.clipboard.writeText(`Prezados pais e/ou responsáveis,
+
+Informamos que o(a) aluno(a) @value1 não compareceu às atividades escolares realizadas no dia de hoje (chamada realizada na primeira aula). Poderia confirmar se há alguma justificativa legal, como atestado médico? Caso já tenha entregue o atestado para a secretaria, pode desconsiderar esta mensagem. Para outros motivos, reforçamos que cada dia corresponde a 5 faltas.
+
+Caso já tenha realizado a justificativa, por gentileza, desconsidere este aviso.
+
+Aguardamos seu retorno.
+Qualquer dúvida, estarei à disposição.
+
+Para outros assuntos, entre em contato com a secretaria pelo número (41) 99501-3079.
+
+Atenciosamente,
+Equipe Pedagógica
+Colégio Estadial Leocádia Braga Ramos 
+`);
+          }}
+        >
+          Copiar Texto
+        </CopyText>
       </ButtonsDiv>
 
       <Container>

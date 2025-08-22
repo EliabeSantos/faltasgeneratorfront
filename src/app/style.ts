@@ -25,13 +25,22 @@ export const ButtonsDiv = styled.div`
   gap: 5px;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(10, 1fr) !important;
 `;
 
 export const DownloadButton = styled.button`
   width: auto;
   padding: 10px;
   text-align: center;
+  grid-column: span 4;
+  background-color: rgb(134, 205, 130);
+  color: white;
+`;
+export const CopyText = styled.button`
+  width: auto;
+  padding: 10px;
+  text-align: center;
+  grid-column: span 2;
   background-color: rgb(134, 205, 130);
   color: white;
 `;
@@ -42,6 +51,7 @@ export const InputFileReceiver = styled.label`
   text-align: center;
   align-items: center;
   justify-content: center;
+  grid-column: span 4;
   display: flex;
   > input {
     display: none;
