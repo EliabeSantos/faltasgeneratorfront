@@ -13,13 +13,13 @@ export default function Home() {
     let csvContent = "data:text/csv;charset=utf-8,";
 
     rows.forEach(function (rowArray) {
-      let row = rowArray.join(",");
+      const row = rowArray.join(",");
       csvContent += row + "\r\n";
     });
-    var encodedUri = encodeURI(csvContent);
+    let encodedUri = encodeURI(csvContent);
     window.open(encodedUri);
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
+    encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "my_data.csv");
     document.body.appendChild(link); // Required for FF
@@ -52,7 +52,7 @@ export default function Home() {
             // ... further processing
             const sheetToJson: any = XLSX.utils.sheet_to_json(worksheet);
             console.log(sheetToJson);
-            let arr: any = [];
+            const arr: any = [];
             let y = -1;
             for (let i = 0; i < sheetToJson.length; i++) {
               if (sheetToJson[i]["__EMPTY_2"]) {
@@ -92,9 +92,9 @@ export default function Home() {
               return (
                 <TurmaDiv key={index}>
                   <h1>{x.curso}</h1>
-                  {x.alunos.map((y: any) => {
+                  {x.alunos.map((y: any, index: any) => {
                     return (
-                      <AlunoDiv>
+                      <AlunoDiv key={index}>
                         <div>{y["__EMPTY_2"]}</div>
                         <div>{y["__EMPTY_4"]}</div>
                         <div>{y["__EMPTY_12"]}</div>
