@@ -19,7 +19,7 @@ export default function Home() {
     let encodedUri = encodeURI(csvContent);
     window.open(encodedUri);
     encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
+    const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "my_data.csv");
     document.body.appendChild(link); // Required for FF
