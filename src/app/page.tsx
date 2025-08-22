@@ -3,7 +3,15 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import readXlsFile from "read-excel-file";
 import { useEffect, useState } from "react";
-import { AlunoDiv, MainDiv, TurmaDiv } from "./style";
+import {
+  AlunoDiv,
+  ButtonsDiv,
+  Container,
+  DownloadButton,
+  InputFileReceiver,
+  MainDiv,
+  TurmaDiv,
+} from "./style";
 export default function Home() {
   const [FullList, setFullList] = useState<Array<any>>([]);
   const [SelectedStudents, setSelectedStudents] = useState<Array<any>>([]);
@@ -20,11 +28,11 @@ export default function Home() {
     window.open(encodedUri);
     encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "my_data.csv");
-    document.body.appendChild(link); // Required for FF
+    // link.setAttribute("href", encodedUri);
+    // link.setAttribute("download", "test");
+    // document.body.appendChild(link); // Required for FF
 
-    link.click();
+    // link.click();
   };
 
   useEffect(() => {
@@ -32,61 +40,122 @@ export default function Home() {
   }, [SelectedStudents]);
   return (
     <MainDiv>
-      <button
-        onClick={() => {
-          downloadCsv();
-        }}
-      >
-        Test
-      </button>
-      <input
-        type="file"
-        id="input"
-        onChange={(input: any) => {
-          const reader = new FileReader();
-          reader.onload = (e: any) => {
-            const data = new Uint8Array(e.target.result);
-            // Process data with SheetJS
-            const workbook = XLSX.read(data, { type: "array" });
-            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-            // ... further processing
-            const sheetToJson: any = XLSX.utils.sheet_to_json(worksheet);
-            console.log(sheetToJson);
-            const arr: any = [];
-            let y = -1;
-            for (let i = 0; i < sheetToJson.length; i++) {
-              if (sheetToJson[i]["__EMPTY_2"]) {
-                if (
-                  sheetToJson[i]["__EMPTY_2"].toLowerCase().includes("curso")
-                ) {
-                  arr.push({
-                    curso:
-                      sheetToJson[i]["__EMPTY_5"] +
-                      " " +
-                      sheetToJson[i]["__EMPTY_13"],
-                    alunos: [],
-                  });
-                  y++;
+      <ButtonsDiv>
+        <DownloadButton
+          disabled={SelectedStudents.length == 0}
+          onClick={() => {
+            downloadCsv();
+          }}
+        >
+          Download CSV
+        </DownloadButton>
+        <InputFileReceiver>
+          <p>Selecione o arquivo</p>
+          <input
+            type="file"
+            id="input"
+            onChange={(input: any) => {
+              const reader = new FileReader();
+              reader.onload = (e: any) => {
+                const data = new Uint8Array(e.target.result);
+                // Process data with SheetJS
+                const workbook = XLSX.read(data, { type: "array" });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                // ... further processing
+                const sheetToJson: any = XLSX.utils.sheet_to_json(worksheet);
+                console.log(sheetToJson);
+                const arr: any = [];
+                let y = -1;
+                let skip = false;
+                for (let i = 0; i < sheetToJson.length; i++) {
+                  if (sheetToJson[i]["__EMPTY_2"]) {
+                    if (
+                      sheetToJson[i]["__EMPTY_2"]
+                        .toLowerCase()
+                        .includes("curso") &&
+                      !sheetToJson[i]["__EMPTY_5"]
+                        .toLowerCase()
+                        .includes("sem seriação") &&
+                      !sheetToJson[i]["__EMPTY_2"]
+                        .toLowerCase()
+                        .includes("pma-programa") &&
+                      !sheetToJson[i]["__EMPTY_2"]
+                        .toLowerCase()
+                        .includes("aluno monitor") &&
+                      !sheetToJson[i]["__EMPTY_2"]
+                        .toLowerCase()
+                        .includes("sala r.") &&
+                      !sheetToJson[i]["__EMPTY_2"]
+                        .toLowerCase()
+                        .includes("medio if") &&
+                      !sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("medio fgb ept") &&
+                      !sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("profissional")
+                    ) {
+                      skip = false;
+                      arr.push({
+                        curso: sheetToJson[i]["__EMPTY_2"].includes("TEC")
+                          ? sheetToJson[i]["__EMPTY_5"] +
+                            " " +
+                            sheetToJson[i]["__EMPTY_13"] +
+                            "TEC"
+                          : sheetToJson[i]["__EMPTY_5"] +
+                            " " +
+                            sheetToJson[i]["__EMPTY_13"],
+                        alunos: [],
+                      });
+                      y++;
+                    }
+                    if (
+                      sheetToJson[i]["__EMPTY_5"]
+                        ?.toLowerCase()
+                        .includes("sem seriação") ||
+                      sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("pma-programa") ||
+                      sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("aluno monitor") ||
+                      sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("sala r.") ||
+                      sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("medio if") ||
+                      sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("medio fgb ept") ||
+                      sheetToJson[i]["__EMPTY_2"]
+                        ?.toLowerCase()
+                        .includes("profissional")
+                    ) {
+                      console.log("test");
+                      skip = true;
+                    }
+                  }
+                  if (sheetToJson[i]["__EMPTY_12"]) {
+                    if (
+                      sheetToJson[i]["__EMPTY_12"]
+                        .toLowerCase()
+                        .includes("matriculado") &&
+                      skip == false
+                    ) {
+                      arr[y]?.alunos.push(sheetToJson[i]);
+                    }
+                  }
                 }
-                console.log(sheetToJson[i]);
-              }
-              if (sheetToJson[i]["__EMPTY_12"]) {
-                if (
-                  sheetToJson[i]["__EMPTY_12"]
-                    .toLowerCase()
-                    .includes("matriculado")
-                ) {
-                  arr[y]?.alunos.push(sheetToJson[i]);
-                }
-              }
-            }
-            console.log(arr);
-            setFullList(arr);
-          };
-          reader.readAsArrayBuffer(input.target.files[0]);
-        }}
-      />
-      <div>
+                setFullList(arr);
+              };
+              reader.readAsArrayBuffer(input.target.files[0]);
+            }}
+          />
+        </InputFileReceiver>
+      </ButtonsDiv>
+
+      <Container>
         {FullList
           ? FullList?.map((x, index) => {
               return (
@@ -95,9 +164,12 @@ export default function Home() {
                   {x.alunos.map((y: any, index: any) => {
                     return (
                       <AlunoDiv key={index}>
-                        <div>{y["__EMPTY_2"]}</div>
-                        <div>{y["__EMPTY_4"]}</div>
-                        <div>{y["__EMPTY_12"]}</div>
+                        <div>
+                          <p>{y["__EMPTY_2"]}</p>
+                        </div>
+                        <div>
+                          <p>{y["__EMPTY_4"]}</p>
+                        </div>
                         <input
                           type="checkbox"
                           onChange={(event) => {
@@ -105,7 +177,9 @@ export default function Home() {
                             if (event.target.checked) {
                               const obj = [
                                 y["__EMPTY_8"],
-                                x.curso.replace("Seriação: ", "") +
+                                x.curso
+                                  .replace("Seriação: ", "")
+                                  .replace("Turma: ", "") +
                                   "" +
                                   y["__EMPTY_4"],
                               ];
@@ -125,7 +199,7 @@ export default function Home() {
               );
             })
           : null}
-      </div>
+      </Container>
     </MainDiv>
   );
 }
