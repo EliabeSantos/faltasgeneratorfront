@@ -26,14 +26,18 @@ export default function Home() {
       csvContent += row + "\r\n";
     });
     let encodedUri = encodeURI(csvContent);
-    window.open(encodedUri);
+    // window.open(encodedUri);
     encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    // link.setAttribute("href", encodedUri);
-    // link.setAttribute("download", "test");
-    // document.body.appendChild(link); // Required for FF
+    link.setAttribute("href", encodedUri);
+    const today = new Date();
+    link.setAttribute(
+      "download",
+      "Alunos Faltantes" + today.toLocaleDateString("pt-br")
+    );
+    document.body.appendChild(link); // Required for FF
 
-    // link.click();
+    link.click();
   };
 
   useEffect(() => {
