@@ -20,7 +20,7 @@ export default function Home() {
   const [filter, setFilter] = useState<Array<any>>([]);
   const [selectedFilter, setSelectedFilter] = useState<Array<any>>([]);
   const [SelectedStudents, setSelectedStudents] = useState<Array<any>>([]);
-  const [filterByName, setFilterByName] = useState<String>("");
+  const [filterByName, setFilterByName] = useState<string>("");
   const downloadCsv = async () => {
     const rows = SelectedStudents;
 
@@ -44,15 +44,16 @@ export default function Home() {
 
     link.click();
   };
-  function debounce(func: any, timeout: any) {
-    let timer: any;
+  /* eslint prefer-const: ["error", { ignoreReadBeforeAssign: true }] */
+  const debounce = (func: any) => {
     console.log("DEBOUNCE");
+    let timer: any;
     console.log("DEBOUNCE");
     clearTimeout(timer);
     timer = setTimeout(() => {
       setFilterByName(func);
-    }, timeout);
-  }
+    }, 500);
+  };
   useEffect(() => {
     console.log(filterByName);
     setFullList([...FullList]);
@@ -228,7 +229,7 @@ export default function Home() {
         {filter != undefined && FullList.length > 0 && (
           <NameSearch>
             Nome Aluno
-            <input onChange={(e) => debounce(e.target.value, 500)}></input>
+            <input onChange={(e) => debounce(e.target.value)}></input>
           </NameSearch>
         )}
       </ButtonsDiv>
