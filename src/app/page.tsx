@@ -3,6 +3,7 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import readXlsFile from "read-excel-file";
 import { useEffect, useState } from "react";
+import { FaFileArrowUp, FaFileArrowDown, FaCopy } from "react-icons/fa6";
 import {
   AlunoDiv,
   ButtonsDiv,
@@ -10,6 +11,7 @@ import {
   CopyText,
   DownloadButton,
   FilterCell,
+  FilterCellContainer,
   InputFileReceiver,
   MainDiv,
   NameSearch,
@@ -66,6 +68,7 @@ export default function Home() {
       <ButtonsDiv>
         <InputFileReceiver>
           <p>Selecione o arquivo</p>
+          <FaFileArrowUp id="IconSelectFile"></FaFileArrowUp>
           <input
             type="file"
             id="input"
@@ -182,50 +185,56 @@ export default function Home() {
             downloadCsv();
           }}
         >
-          Download CSV
+          <p>Download CSV</p>
+          <FaFileArrowDown />
         </DownloadButton>
         <CopyText
           onClick={() => {
-            navigator.clipboard.writeText(`Prezados pais e/ou responsáveis,
+            navigator.clipboard.writeText(
+              `Prezados pais e/ou responsáveis,
 
-                Informamos que o(a) aluno(a) @value1 não compareceu às atividades escolares realizadas no dia de hoje (chamada realizada na primeira aula). Poderia confirmar se há alguma justificativa legal, como atestado médico? Caso já tenha entregue o atestado para a secretaria, pode desconsiderar esta mensagem. Para outros motivos, reforçamos que cada dia corresponde a 5 faltas.
+Informamos que o(a) aluno(a) @value1 não compareceu às atividades escolares realizadas no dia de hoje (chamada realizada na primeira aula). Poderia confirmar se há alguma justificativa legal, como atestado médico? Caso já tenha entregue o atestado para a secretaria, pode desconsiderar esta mensagem. Para outros motivos, reforçamos que cada dia corresponde a 5 faltas.
 
-                Caso já tenha realizado a justificativa, por gentileza, desconsidere este aviso.
+Caso já tenha realizado a justificativa, por gentileza, desconsidere este aviso.
 
-                Aguardamos seu retorno.
-                Qualquer dúvida, estarei à disposição.
+Aguardamos seu retorno.
+Qualquer dúvida, estarei à disposição.
 
-                Para outros assuntos, entre em contato com a secretaria pelo número (41) 99501-3079.
+Para outros assuntos, entre em contato com a secretaria pelo número (41) 99501-3079.
 
-                Atenciosamente,
-                Equipe Pedagógica
-                Colégio Estadial Leocádia Braga Ramos 
-`);
+Atenciosamente,
+Equipe Pedagógica
+Colégio Estadial Leocádia Braga Ramos 
+`
+            );
           }}
         >
-          Copiar Texto
+          <p>Copiar Texto</p>
+          <FaCopy />
         </CopyText>
-        {filter
-          ? filter.map((item, index) => {
-              return (
-                <FilterCell key={index}>
-                  {item}
-                  <input
-                    type="checkbox"
-                    onChange={(event) => {
-                      console.log("CLICK", event.target.checked);
-                      if (event.target.checked)
-                        setSelectedFilter([...selectedFilter, item]);
-                      else
-                        setSelectedFilter([
-                          ...selectedFilter.filter((x) => x != item),
-                        ]);
-                    }}
-                  ></input>
-                </FilterCell>
-              );
-            })
-          : null}
+        <FilterCellContainer>
+          {filter
+            ? filter.map((item, index) => {
+                return (
+                  <FilterCell key={index}>
+                    {item}
+                    <input
+                      type="checkbox"
+                      onChange={(event) => {
+                        console.log("CLICK", event.target.checked);
+                        if (event.target.checked)
+                          setSelectedFilter([...selectedFilter, item]);
+                        else
+                          setSelectedFilter([
+                            ...selectedFilter.filter((x) => x != item),
+                          ]);
+                      }}
+                    ></input>
+                  </FilterCell>
+                );
+              })
+            : null}
+        </FilterCellContainer>
         {filter != undefined && FullList.length > 0 && (
           <NameSearch>
             Nome Aluno

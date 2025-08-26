@@ -9,11 +9,11 @@ export const MainDiv = styled.div`
   * {
     color: white;
   }
-  > div {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
+
   position: relative;
+  @media (max-width: 700px) {
+    padding-top: 130px;
+  }
 `;
 
 export const ButtonsDiv = styled.div`
@@ -25,9 +25,23 @@ export const ButtonsDiv = styled.div`
   gap: 5px;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(10, 1fr) !important;
+  grid-template-columns: repeat(10, 1fr);
+  p {
+    margin-right: 10px;
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(3, 1fr) !important;
+    > p {
+      display: none;
+    }
+  }
 `;
-
+export const FilterCellContainer = styled.div`
+  grid-column: span 4;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-right: 5px;
+`;
 export const FilterCell = styled.label`
   font-size: 20px;
   display: flex;
@@ -41,6 +55,16 @@ export const FilterCell = styled.label`
     height: 30px;
     margin-left: auto;
   }
+  @media (max-width: 700px) {
+    > input {
+      max-width: 30px;
+      min-width: 30px;
+      margin-right: 3px;
+      height: 20px;
+      margin-left: auto;
+    }
+  }
+  grid-column: span 1;
   border: 2px solid #ff9f1c;
 `;
 export const NameSearch = styled.label`
@@ -54,6 +78,9 @@ export const NameSearch = styled.label`
     margin-left: auto;
     margin-right: 3px;
   }
+  @media (max-width: 700px) {
+    grid-column: span 3;
+  }
 `;
 
 export const DownloadButton = styled.button`
@@ -61,8 +88,23 @@ export const DownloadButton = styled.button`
   padding: 10px;
   text-align: center;
   grid-column: span 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: rgb(134, 205, 130);
   color: white;
+  p {
+    margin-right: 10px;
+  }
+  @media (max-width: 700px) {
+    grid-column: span 1;
+    svg {
+      font-size: 24px;
+    }
+    > p {
+      display: none;
+    }
+  }
 `;
 export const CopyText = styled.button`
   width: auto;
@@ -71,6 +113,21 @@ export const CopyText = styled.button`
   grid-column: span 2;
   background-color: rgb(134, 205, 130);
   color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  p {
+    margin-right: 10px;
+  }
+  @media (max-width: 700px) {
+    grid-column: span 1;
+    > p {
+      display: none;
+    }
+    svg {
+      font-size: 24px;
+    }
+  }
 `;
 
 export const InputFileReceiver = styled.label`
@@ -84,10 +141,31 @@ export const InputFileReceiver = styled.label`
   > input {
     display: none;
   }
+  @media (max-width: 700px) {
+    grid-column: span 1;
+    svg {
+      font-size: 24px;
+    }
+    > p {
+      display: none;
+    }
+  }
 `;
 export const Container = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  @media (max-width: 2000px) {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  @media (max-width: 1420px) {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  @media (max-width: 1040px) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(1, 1fr) !important;
+  }
+
   gap: 5px;
 `;
 export const TurmaDiv = styled.div`
@@ -111,18 +189,23 @@ export const AlunoDiv = styled.label`
   max-height: 46px;
   padding: 3px;
   > input {
-    max-width: 30px;
-    min-width: 30px;
+    max-width: 25px;
+    min-width: 25px;
     margin-left: auto;
     margin-right: 3px;
   }
   > div {
+    display: flex;
+    align-items: center;
     max-height: 40px;
     min-height: 40px;
   }
   :nth-child(2) {
     grid-column: span 8;
-    text-align: center;
     font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis !important;
+    max-width: 100%;
   }
 `;
