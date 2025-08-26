@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const MainDiv = styled.div`
   width: 100%;
   background-color: #231f20;
-  padding-top: 50px;
+  padding-top: 90px;
   min-height: 100vh;
 
   * {
@@ -26,6 +26,34 @@ export const ButtonsDiv = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(10, 1fr) !important;
+`;
+
+export const FilterCell = styled.label`
+  font-size: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 5px;
+  > input {
+    max-width: 40px;
+    min-width: 40px;
+    margin-right: 3px;
+    height: 30px;
+    margin-left: auto;
+  }
+  border: 2px solid #ff9f1c;
+`;
+export const NameSearch = styled.label`
+  font-size: 14px;
+  grid-column: span 6;
+  display: flex;
+  border: 2px solid #ff9f1c;
+  flex-direction: column;
+  > input {
+    width: 100%;
+    margin-left: auto;
+    margin-right: 3px;
+  }
 `;
 
 export const DownloadButton = styled.button`

@@ -9,13 +9,18 @@ import {
   Container,
   CopyText,
   DownloadButton,
+  FilterCell,
   InputFileReceiver,
   MainDiv,
+  NameSearch,
   TurmaDiv,
 } from "./style";
 export default function Home() {
   const [FullList, setFullList] = useState<Array<any>>([]);
+  const [filter, setFilter] = useState<Array<any>>([]);
+  const [selectedFilter, setSelectedFilter] = useState<Array<any>>([]);
   const [SelectedStudents, setSelectedStudents] = useState<Array<any>>([]);
+  const [filterByName, setFilterByName] = useState<String>("");
   const downloadCsv = async () => {
     const rows = SelectedStudents;
 
@@ -39,7 +44,19 @@ export default function Home() {
 
     link.click();
   };
-
+  function debounce(func: any, timeout: any) {
+    let timer: any;
+    console.log("DEBOUNCE");
+    console.log("DEBOUNCE");
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      setFilterByName(func);
+    }, timeout);
+  }
+  useEffect(() => {
+    console.log(filterByName);
+    setFullList([...FullList]);
+  }, [selectedFilter, filterByName]);
   useEffect(() => {
     console.log(SelectedStudents);
   }, [SelectedStudents]);
@@ -62,6 +79,7 @@ export default function Home() {
                 const sheetToJson: any = XLSX.utils.sheet_to_json(worksheet);
                 console.log(sheetToJson);
                 const arr: any = [];
+                const controlArr: any = [];
                 let y = -1;
                 let skip = false;
                 for (let i = 0; i < sheetToJson.length; i++) {
@@ -93,17 +111,23 @@ export default function Home() {
                         .includes("profissional")
                     ) {
                       skip = false;
+                      const curso: any = sheetToJson[i]["__EMPTY_2"].includes(
+                        "TEC"
+                      )
+                        ? sheetToJson[i]["__EMPTY_5"] +
+                          " " +
+                          sheetToJson[i]["__EMPTY_13"] +
+                          "TEC"
+                        : sheetToJson[i]["__EMPTY_5"] +
+                          " " +
+                          sheetToJson[i]["__EMPTY_13"];
+                      if (!controlArr.find((x: any) => curso.includes(x)))
+                        controlArr.push(curso.split("").slice(10, 12).join(""));
                       arr.push({
-                        curso: sheetToJson[i]["__EMPTY_2"].includes("TEC")
-                          ? sheetToJson[i]["__EMPTY_5"] +
-                            " " +
-                            sheetToJson[i]["__EMPTY_13"] +
-                            "TEC"
-                          : sheetToJson[i]["__EMPTY_5"] +
-                            " " +
-                            sheetToJson[i]["__EMPTY_13"],
+                        curso: curso,
                         alunos: [],
                       });
+                      console.log("TEST", controlArr);
                       y++;
                     }
                     if (
@@ -145,6 +169,7 @@ export default function Home() {
                   }
                 }
                 setFullList(arr);
+                setFilter(controlArr);
               };
               reader.readAsArrayBuffer(input.target.files[0]);
             }}
@@ -162,32 +187,71 @@ export default function Home() {
           onClick={() => {
             navigator.clipboard.writeText(`Prezados pais e/ou responsáveis,
 
-Informamos que o(a) aluno(a) @value1 não compareceu às atividades escolares realizadas no dia de hoje (chamada realizada na primeira aula). Poderia confirmar se há alguma justificativa legal, como atestado médico? Caso já tenha entregue o atestado para a secretaria, pode desconsiderar esta mensagem. Para outros motivos, reforçamos que cada dia corresponde a 5 faltas.
+                Informamos que o(a) aluno(a) @value1 não compareceu às atividades escolares realizadas no dia de hoje (chamada realizada na primeira aula). Poderia confirmar se há alguma justificativa legal, como atestado médico? Caso já tenha entregue o atestado para a secretaria, pode desconsiderar esta mensagem. Para outros motivos, reforçamos que cada dia corresponde a 5 faltas.
 
-Caso já tenha realizado a justificativa, por gentileza, desconsidere este aviso.
+                Caso já tenha realizado a justificativa, por gentileza, desconsidere este aviso.
 
-Aguardamos seu retorno.
-Qualquer dúvida, estarei à disposição.
+                Aguardamos seu retorno.
+                Qualquer dúvida, estarei à disposição.
 
-Para outros assuntos, entre em contato com a secretaria pelo número (41) 99501-3079.
+                Para outros assuntos, entre em contato com a secretaria pelo número (41) 99501-3079.
 
-Atenciosamente,
-Equipe Pedagógica
-Colégio Estadial Leocádia Braga Ramos 
+                Atenciosamente,
+                Equipe Pedagógica
+                Colégio Estadial Leocádia Braga Ramos 
 `);
           }}
         >
           Copiar Texto
         </CopyText>
+        {filter
+          ? filter.map((item, index) => {
+              return (
+                <FilterCell key={index}>
+                  {item}
+                  <input
+                    type="checkbox"
+                    onChange={(event) => {
+                      console.log("CLICK", event.target.checked);
+                      if (event.target.checked)
+                        setSelectedFilter([...selectedFilter, item]);
+                      else
+                        setSelectedFilter([
+                          ...selectedFilter.filter((x) => x != item),
+                        ]);
+                    }}
+                  ></input>
+                </FilterCell>
+              );
+            })
+          : null}
+        {filter != undefined && FullList.length > 0 && (
+          <NameSearch>
+            Nome Aluno
+            <input onChange={(e) => debounce(e.target.value, 500)}></input>
+          </NameSearch>
+        )}
       </ButtonsDiv>
 
       <Container>
-        {FullList
+        {FullList && selectedFilter != undefined && filterByName != undefined
           ? FullList?.map((x, index) => {
+              if (
+                selectedFilter.length &&
+                !selectedFilter.find((y) => x?.curso?.includes(y))
+              )
+                return;
               return (
                 <TurmaDiv key={index}>
                   <h1>{x.curso}</h1>
                   {x.alunos.map((y: any, index: any) => {
+                    if (
+                      filterByName.length &&
+                      !y["__EMPTY_4"]
+                        .toLowerCase()
+                        .includes(filterByName.toLocaleLowerCase())
+                    )
+                      return;
                     return (
                       <AlunoDiv key={index}>
                         <div>
@@ -199,24 +263,33 @@ Colégio Estadial Leocádia Braga Ramos
                         <input
                           type="checkbox"
                           onChange={(event) => {
-                            console.log(event.target.checked);
-                            if (event.target.checked) {
-                              const obj = [
-                                y["__EMPTY_8"],
-                                x.curso
-                                  .replace("Seriação: ", "")
-                                  .replace("Turma: ", "") +
-                                  "" +
-                                  y["__EMPTY_4"],
-                              ];
-
+                            const obj = [
+                              y["__EMPTY_8"],
+                              x.curso
+                                .replace("Seriação: ", "")
+                                .replace("Turma: ", "") +
+                                "" +
+                                y["__EMPTY_4"],
+                            ];
+                            if (
+                              !SelectedStudents.find((z) =>
+                                z[1]?.includes(y["__EMPTY_4"])
+                              )
+                            ) {
                               setSelectedStudents([...SelectedStudents, obj]);
                             } else {
                               setSelectedStudents([
-                                ...SelectedStudents.filter((x) => x != y),
+                                ...SelectedStudents.filter((x) => {
+                                  return x[1] != obj[1];
+                                }),
                               ]);
                             }
                           }}
+                          defaultChecked={false}
+                          value={y["__EMPTY_4"]}
+                          checked={SelectedStudents.find((z) =>
+                            z[1]?.includes(y["__EMPTY_4"])
+                          )}
                         />
                       </AlunoDiv>
                     );
