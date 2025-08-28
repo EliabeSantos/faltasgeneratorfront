@@ -276,7 +276,7 @@ Colégio Estadial Leocádia Braga Ramos
                         return;
                       return (
                         <AlunoDiv
-                          invalido={invalidNumber.find(
+                          invalido={invalidNumber?.find(
                             (x: any) =>
                               x == y["__EMPTY_8"].replace(/[^A-Za-z0-9]/g, "")
                           )}
