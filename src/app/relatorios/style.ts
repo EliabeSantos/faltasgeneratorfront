@@ -202,15 +202,18 @@ export const TurmaDiv = styled.div`
   max-height: 100%;
   gap: 3px;
 `;
-export const AlunoDiv = styled.label<CSinput>`
+export const AlunoDiv = styled.label`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   border: 2px solid #ff9f1c;
   max-height: 46px;
-  background-color: ${(props) => (props.invalido ? "#ff9f1c" : "")};
   padding: 3px;
   > input {
+    max-width: 25px;
+    min-width: 25px;
+    margin-left: auto;
+    margin-right: 3px;
   }
   > div {
     display: flex;
@@ -226,13 +229,4 @@ export const AlunoDiv = styled.label<CSinput>`
     text-overflow: ellipsis !important;
     max-width: 100%;
   }
-`;
-interface CSinput {
-  invalido: boolean;
-}
-export const CustumizedInput = styled.input`
-  max-width: 25px;
-  min-width: 25px;
-  margin-left: auto;
-  margin-right: 3px;
 `;
