@@ -35,9 +35,10 @@ export default function Relatorios() {
   };
 
   const MakeSumari = () => {
-    const NumerosInvalidos = localStorage.getItem("numeros invalidos")!
+    const NumerosInvalidos = localStorage.getItem("numeros invalidos")
       ? JSON.parse(localStorage.getItem("numeros invalidos")!)
       : [];
+    console.log(NumerosInvalidos);
     const AlunosFaltantes = JSON.parse(
       localStorage.getItem("alunos faltantes")!
     );
@@ -51,15 +52,17 @@ export default function Relatorios() {
     };
     const newArr = sumariSheet.filter((cell, index) => {
       if (cell["Status"] == "Número Whatsapp inválido") {
-        if (!NumerosInvalidos?.find((x: any) => x == cell["Enviar para "]))
-          localStorage.setItem(
-            "numeros invalidos",
-            JSON.stringify(
-              NumerosInvalidos
-                ? [...NumerosInvalidos, cell["Enviar para "]]
-                : [cell["Enviar para "]]
-            )
-          );
+        if (AlunosFaltantes?.length) {
+          if (!NumerosInvalidos?.find((x: any) => x == cell["Enviar para "]))
+            localStorage.setItem(
+              "numeros invalidos",
+              JSON.stringify(
+                NumerosInvalidos
+                  ? [...NumerosInvalidos, cell["Enviar para "]]
+                  : [cell["Enviar para "]]
+              )
+            );
+        }
       }
       if (cell["Enviar para "] == "Relatório de Envio") return;
       if (cell["Enviar para "] == "Total") {
@@ -88,15 +91,15 @@ export default function Relatorios() {
         };
         return;
       }
-      if (!AlunosFaltantes.find((x: any) => x == cell["Enviar para "]))
-        localStorage.setItem(
-          "numeros invalidos",
-          JSON.stringify(
-            NumerosInvalidos
-              ? [...NumerosInvalidos, cell["Enviar para "]]
-              : [cell["Enviar para "]]
-          )
-        );
+      // if (!AlunosFaltantes.find((x: any) => x == cell["Enviar para "]))
+      //   localStorage.setItem(
+      //     "numeros invalidos",
+      //     JSON.stringify(
+      //       NumerosInvalidos
+      //         ? [...NumerosInvalidos, cell["Enviar para "]]
+      //         : [cell["Enviar para "]]
+      //     )
+      //   );
       return cell;
     });
     setFormatedSumariSheet(newArr);
