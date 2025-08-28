@@ -1,9 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
 
-import axios from "axios";
+import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import readXlsFile from "read-excel-file";
 import { FaFileArrowUp, FaFileArrowDown, FaCopy } from "react-icons/fa6";
 import {
   ButtonsDiv,
@@ -12,7 +10,6 @@ import {
   MainDiv,
   RelatoryContainer,
 } from "./style";
-import { json } from "stream/consumers";
 export default function Relatorios() {
   const [sumariSheet, setSumariSheet] = useState<Array<any>>([]);
   const [formatedSumariSheet, setFormatedSumariSheet] = useState<Array<any>>(
