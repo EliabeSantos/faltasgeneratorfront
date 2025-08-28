@@ -35,14 +35,10 @@ export default function Relatorios() {
   };
 
   const MakeSumari = () => {
-    const NumerosInvalidos = localStorage.getItem("numeros invalidos")
-      ? JSON.parse(localStorage.getItem("numeros invalidos")!)
-      : [];
-    console.log(NumerosInvalidos);
-    const AlunosFaltantes = JSON.parse(
-      localStorage.getItem("alunos faltantes")!
+    const NumerosInvalidos = JSON.parse(
+      localStorage.getItem("numeros invalidos")!
     );
-
+    let control: any = [];
     let data = {
       Total: 0,
       Enviado: 0,
@@ -52,17 +48,8 @@ export default function Relatorios() {
     };
     const newArr = sumariSheet.filter((cell, index) => {
       if (cell["Status"] == "Número Whatsapp inválido") {
-        if (AlunosFaltantes?.length) {
-          if (!NumerosInvalidos?.find((x: any) => x == cell["Enviar para "]))
-            localStorage.setItem(
-              "numeros invalidos",
-              JSON.stringify(
-                NumerosInvalidos
-                  ? [...NumerosInvalidos, cell["Enviar para "]]
-                  : [cell["Enviar para "]]
-              )
-            );
-        }
+        if (!NumerosInvalidos?.find((x: any) => x == cell["Enviar para "]))
+          control = [...control, cell["Enviar para "]];
       }
       if (cell["Enviar para "] == "Relatório de Envio") return;
       if (cell["Enviar para "] == "Total") {
@@ -102,6 +89,7 @@ export default function Relatorios() {
       //   );
       return cell;
     });
+    localStorage.setItem("numeros invalidos", JSON.stringify(control));
     setFormatedSumariSheet(newArr);
     setSumariData(data);
     console.log(data, [...newArr]);
