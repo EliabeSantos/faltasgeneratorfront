@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { FaFileArrowUp, FaFileArrowDown, FaCopy } from "react-icons/fa6";
+import { FaFileArrowUp, FaFileArrowDown } from "react-icons/fa6";
 import {
   ButtonsDiv,
   DownloadButton,
@@ -47,7 +47,7 @@ export default function Relatorios() {
       localStorage.getItem("numeros-invalidos")!
     );
     let control: any = NumerosInvalidos ? [...NumerosInvalidos] : [];
-    let controlTurma: Array<any> = [];
+    const controlTurma: Array<any> = [];
     let data = {
       Total: 0,
       Enviado: 0,
@@ -55,7 +55,7 @@ export default function Relatorios() {
       "Número inválido ": 0,
       Invalido: 0,
     };
-    const newArr = sumariSheet.filter((cell, index) => {
+    const newArr = sumariSheet.filter((cell) => {
       if (cell["Status"] == "Número Whatsapp inválido") {
         if (!NumerosInvalidos?.find((x: any) => x == cell["Enviar para "]))
           control = [...control, cell["Enviar para "]];

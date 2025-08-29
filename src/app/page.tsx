@@ -3,7 +3,6 @@ import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
 import { FaFileArrowUp, FaFileArrowDown, FaCopy } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
-import { IoIosCloseCircleOutline } from "react-icons/io";
 import Link from "next/link";
 import {
   AlunoDiv,
@@ -18,7 +17,6 @@ import {
   MainDiv,
   NameSearch,
   NavContainer,
-  RelatoryContainer,
   TurmaDiv,
 } from "./style";
 
@@ -406,7 +404,7 @@ Colégio Estadual Leocádia Braga Ramos
                           </div>
                           <CustumizedInput
                             type="checkbox"
-                            onChange={(event) => {
+                            onChange={() => {
                               if (
                                 !SelectedStudents.find((z) =>
                                   z[1]?.includes(Aluno["__EMPTY_4"])
