@@ -30,7 +30,7 @@ export const ButtonsDiv = styled.div`
     margin-right: 10px;
   }
   @media (max-width: 700px) {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(4, 1fr) !important;
     > p {
       display: none;
     }
@@ -82,7 +82,7 @@ export const NameSearch = styled.label`
     height: 100%;
   }
   @media (max-width: 700px) {
-    grid-column: span 3;
+    grid-column: span 4;
   }
 `;
 
@@ -148,7 +148,7 @@ export const InputFileReceiver = styled.label`
     display: none;
   }
   @media (max-width: 700px) {
-    grid-column: span 1;
+    grid-column: span 2;
     svg {
       font-size: 24px;
     }
@@ -283,6 +283,20 @@ export const NavContainer = styled.div`
       border: 2px solid #ff9f1c;
       height: 100%;
       padding: 0 5px;
+    }
+  }
+  @media (max-width: 1980px) {
+    grid-template-columns: repeat(10, 1fr) !important;
+    grid-column: span 10;
+    > div {
+      grid-column: span 8;
+    }
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-column: span 4;
+    > div {
+      grid-column: span 2;
     }
   }
 `;

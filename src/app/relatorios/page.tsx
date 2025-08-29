@@ -10,15 +10,33 @@ import {
   MainDiv,
   RelatoryContainer,
   Footer,
-  RelatorioDataContainer,
+  InputsContainer,
+  MainPageContainer,
+  SidePage,
 } from "./style";
+interface data {
+  total: number;
+  enviado: number;
+  invalido: number;
+  fracassado: number;
+  respondido: number;
+}
 export default function Relatorios() {
   const [sumariSheet, setSumariSheet] = useState<Array<any>>([]);
   const [updateSheet, setUpdateSheet] = useState<number>(0);
   const [schollData, setSchollData] = useState<Array<any>>([]);
+  const [savedData, setSavedData] = useState<Array<any>>([]);
+  const [sumaryType, setSumaryType] = useState<string>("Manhã");
+  const [sumaryDate, setSumaryDate] = useState<string>("");
   const [sumariData, setSumariData] = useState<any>({});
   const [sumariSheetFiles, setSumariSheetFiles] = useState<any>();
-
+  const [sumariCount, setSumaryCount] = useState<data>({
+    total: 0,
+    enviado: 0,
+    invalido: 0,
+    fracassado: 0,
+    respondido: 0,
+  });
   useEffect(() => {
     if (sumariSheetFiles != undefined) {
       ReadSumaries();
@@ -26,11 +44,50 @@ export default function Relatorios() {
     if (updateSheet) {
       MakeSumari();
     }
+    console.log(schollData);
   }, [sumariSheetFiles]);
 
+  useEffect(() => {
+    if (schollData.length) {
+      let enviado = 0;
+      let invalido = 0;
+      let fracassado = 0;
+      const respondido = 0;
+
+      for (let i = 0; i < schollData.length; i++) {
+        console.log(
+          "DATA",
+          schollData[i],
+          schollData[i].alunos.filter((x: any) => x.Status == "Enviado").length
+        );
+        enviado += schollData[i].alunos.filter(
+          (x: any) => x.Status == "Enviado"
+        ).length;
+        invalido += schollData[i].alunos.filter(
+          (x: any) => x.Status == "Número Whatsapp inválido"
+        ).length;
+        fracassado += schollData[i].alunos.filter(
+          (x: any) => x.Status == ""
+        ).length;
+      }
+      setSumaryCount({
+        total: invalido + enviado + fracassado + respondido,
+        invalido: invalido,
+        enviado: enviado,
+        fracassado: fracassado,
+        respondido: respondido,
+      });
+      console.log(enviado, invalido);
+    }
+  }, [schollData]);
+
+  useEffect(() => {
+    localStorage.getItem("SavedSumaryData")
+      ? setSavedData(JSON.parse(localStorage.getItem("SavedSumaryData")!))
+      : null;
+  }, []);
   const ReadSumaries = async () => {
     if (!sumariSheetFiles) return;
-    console.log("READ SUMARIES");
     const reader = new FileReader();
     reader.readAsArrayBuffer(sumariSheetFiles);
     reader.onload = (e: any) => {
@@ -87,15 +144,6 @@ export default function Relatorios() {
         };
         return;
       }
-      // if (!AlunosFaltantes.find((x: any) => x == cell["Enviar para "]))
-      //   localStorage.setItem(
-      //     "numeros invalidos",
-      //     JSON.stringify(
-      //       NumerosInvalidos
-      //         ? [...NumerosInvalidos, cell["Enviar para "]]
-      //         : [cell["Enviar para "]]
-      //     )
-      //   );
       const currentTurma =
         cell.Mensagem.split("").slice(63, 73)[7] == " "
           ? cell.Mensagem.split("").slice(63, 70).join("")
@@ -116,12 +164,9 @@ export default function Relatorios() {
       setSchollData(controlTurma);
       return cell;
     });
-    console.log("CONTROL", control);
     localStorage.setItem("numeros-invalidos", JSON.stringify(control));
     setSumariSheetFiles("");
     setSumariData(data);
-    console.log(controlTurma.sort());
-    console.log(data, [...newArr]);
   };
 
   return (
@@ -136,7 +181,6 @@ export default function Relatorios() {
               id="input"
               multiple
               onChange={(input: any) => {
-                console.log("input.target.files", input.target.files);
                 for (let i = 0; i < input.target.files.length; i++) {
                   setTimeout(() => {
                     setSumariSheetFiles(input.target.files[i]);
@@ -144,56 +188,113 @@ export default function Relatorios() {
                       setTimeout(() => {
                         setSumariSheetFiles(undefined);
                         setUpdateSheet(updateSheet + 1);
-                      }, 50 * i);
+                      }, 50 * i + 1);
                     }
-                  }, 50 * i);
+                  }, 50 * i + 1);
                 }
               }}
             />
           </InputFileReceiver>
-          <RelatorioDataContainer>
+          <InputsContainer>
             <label>
-              <input type="date"></input>
+              <input
+                onChange={(event: any) => setSumaryDate(event.target.value)}
+                type="date"
+              ></input>
             </label>
             <label>
-              <select>
-                <option>Manhã</option>
-                <option>Tarde</option>
-                <option>Dia</option>
-                <option>Semana</option>
+              <select
+                onChange={(event: any) => setSumaryType(event.target.value)}
+              >
+                <option value="Manhã">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Dia">Dia</option>
+                <option value="Semana">Semana</option>
               </select>
             </label>
-          </RelatorioDataContainer>
-          <DownloadButton onClick={() => {}}>
+          </InputsContainer>
+          <DownloadButton
+            onClick={() => {
+              console.log({
+                type: sumaryType,
+                date: sumaryDate,
+                data: schollData,
+              });
+              const savedData = localStorage.getItem("SavedSumaryData")
+                ? JSON.parse(localStorage.getItem("SavedSumaryData")!)
+                : [];
+              localStorage.setItem(
+                "SavedSumaryData",
+                JSON.stringify([
+                  ...savedData,
+                  {
+                    type: sumaryType,
+                    date: sumaryDate,
+                    data: schollData,
+                  },
+                ])
+              );
+            }}
+          >
             <p>Gerar Relatorio</p>
             <FaFileArrowDown />
           </DownloadButton>
+          {}
+          <div>
+            <button
+              onClick={() => {
+                setSchollData([]);
+                setSumariSheetFiles(undefined);
+                setSumariSheet([]);
+              }}
+            >
+              Limpar
+            </button>
+          </div>
         </ButtonsDiv>
-        <RelatoryContainer>
-          {schollData
-            ? schollData?.map((cell, index) => {
-                const invalido = cell.alunos.filter(
-                  (x: any) => x.Status == "Número Whatsapp inválido"
-                );
-                const enviado = cell.alunos.filter(
-                  (x: any) => x.Status == "Enviado"
-                );
-                return (
-                  <div key={index}>
-                    <div>{cell.turma}</div>
-                    <div>Total: {cell.alunos.length}</div>
-                    <div>Inválido: {invalido.length}</div>
-                    <div>Enviado: {enviado.length}</div>
-                  </div>
-                );
-              })
-            : null}
-        </RelatoryContainer>
+        <MainPageContainer>
+          <SidePage>
+            {savedData.map((data, index) => {
+              return (
+                <div
+                  key={index}
+                  onClick={() => {
+                    setSchollData(data.data);
+                  }}
+                >
+                  <p>Type: {data.type}</p>
+                  <p>Data: {data.date}</p>
+                </div>
+              );
+            })}
+          </SidePage>
+          <RelatoryContainer>
+            {schollData
+              ? schollData?.map((cell, index) => {
+                  const invalido = cell.alunos.filter(
+                    (x: any) => x.Status == "Número Whatsapp inválido"
+                  );
+                  const enviado = cell.alunos.filter(
+                    (x: any) => x.Status == "Enviado"
+                  );
+                  return (
+                    <div key={index}>
+                      <div>{cell.turma}</div>
+                      <div>Total: {cell.alunos.length}</div>
+                      <div>Inválido: {invalido.length}</div>
+                      <div>Enviado: {enviado.length}</div>
+                    </div>
+                  );
+                })
+              : null}
+          </RelatoryContainer>
+        </MainPageContainer>
         <Footer>
-          <div>Total {sumariData.Total}</div>
-          <div>Enviado {sumariData.Enviado}</div>
-          <div>Fracassado {sumariData.Fracassado}</div>
-          <div>Invalido {sumariData.Invalido}</div>
+          {}
+          <div>Total {sumariCount.total}</div>
+          <div>Enviado {sumariCount.enviado}</div>
+          <div>Fracassado {sumariCount.fracassado}</div>
+          <div>Invalido {sumariCount.invalido}</div>
           <div>Número inválido {sumariData["Número inválido "]}</div>
           <div>Respondido {sumariData["Número inválido "]}</div>
         </Footer>

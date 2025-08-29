@@ -25,7 +25,8 @@ export const ButtonsDiv = styled.div`
   gap: 5px;
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(8, 1fr);
+  height: 25px;
   p {
     margin-right: 10px;
   }
@@ -36,58 +37,13 @@ export const ButtonsDiv = styled.div`
     }
   }
 `;
-export const FilterCellContainer = styled.div`
-  grid-column: span 4;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding-right: 5px;
-`;
-export const FilterCell = styled.label`
-  font-size: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 5px;
-  > input {
-    max-width: 40px;
-    min-width: 40px;
-    margin-right: 3px;
-    height: 30px;
-    margin-left: auto;
-  }
-  @media (max-width: 700px) {
-    > input {
-      max-width: 30px;
-      min-width: 30px;
-      margin-right: 3px;
-      height: 20px;
-      margin-left: auto;
-    }
-  }
-  grid-column: span 1;
-  border: 2px solid #ff9f1c;
-`;
-export const NameSearch = styled.label`
-  font-size: 14px;
-  grid-column: span 6;
-  display: flex;
-  border: 2px solid #ff9f1c;
-  flex-direction: column;
-  > input {
-    width: 100%;
-    margin-left: auto;
-    margin-right: 3px;
-  }
-  @media (max-width: 700px) {
-    grid-column: span 3;
-  }
-`;
 
 export const DownloadButton = styled.button`
   width: auto;
   padding: 10px;
   text-align: center;
   grid-column: span 2;
+  height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -106,16 +62,33 @@ export const DownloadButton = styled.button`
     }
   }
 `;
-export const RelatorioDataContainer = styled.div`
-  width: auto;
-  padding: 10px;
-  text-align: center;
-  grid-column: span 6;
+export const MainPageContainer = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  min-height: 85vh;
+  gap: 5px;
+`;
+export const SidePage = styled.aside`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  grid-column: span 2;
+  > div {
+    border: 1px solid #ff9f1c;
+    margin-bottom: 3px;
+  }
+`;
+export const InputsContainer = styled.div`
+  grid-column: span 4;
   display: flex;
   justify-content: center;
   align-items: center;
   border: 1px solid #ff9f1c;
   color: white;
+  select option {
+    background-color: black !important;
+  }
   p {
     margin-right: 10px;
   }
@@ -194,6 +167,9 @@ export const Container = styled.div`
 
 export const RelatoryContainer = styled.div`
   display: grid;
+  grid-column: span 8;
+  grid-template-columns: repeat(10, 1fr);
+  height: fit-content;
   > div {
     border: 1px solid #ff9f1c;
   }
@@ -260,6 +236,7 @@ export const Footer = styled.div`
   display: grid;
   width: 100%;
   grid-template-columns: repeat(6, 1fr);
+  padding-left: 50px;
   > div {
     display: flex;
     align-items: center;
