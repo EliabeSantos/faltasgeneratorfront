@@ -9,20 +9,28 @@ import {
   InputFileReceiver,
   MainDiv,
   RelatoryContainer,
+  Footer,
+  RelatorioDataContainer,
 } from "./style";
 export default function Relatorios() {
   const [sumariSheet, setSumariSheet] = useState<Array<any>>([]);
-  const [formatedSumariSheet, setFormatedSumariSheet] = useState<Array<any>>(
-    []
-  );
+  const [updateSheet, setUpdateSheet] = useState<number>(0);
+  const [schollData, setSchollData] = useState<Array<any>>([]);
   const [sumariData, setSumariData] = useState<any>({});
   const [sumariSheetFiles, setSumariSheetFiles] = useState<any>();
 
   useEffect(() => {
-    if (sumariSheetFiles) ReadSumaries();
+    if (sumariSheetFiles != undefined) {
+      ReadSumaries();
+    }
+    if (updateSheet) {
+      MakeSumari();
+    }
   }, [sumariSheetFiles]);
 
   const ReadSumaries = async () => {
+    if (!sumariSheetFiles) return;
+    console.log("READ SUMARIES");
     const reader = new FileReader();
     reader.readAsArrayBuffer(sumariSheetFiles);
     reader.onload = (e: any) => {
@@ -36,9 +44,10 @@ export default function Relatorios() {
 
   const MakeSumari = () => {
     const NumerosInvalidos = JSON.parse(
-      localStorage.getItem("numeros invalidos")!
+      localStorage.getItem("numeros-invalidos")!
     );
-    let control: any = [];
+    let control: any = NumerosInvalidos ? [...NumerosInvalidos] : [];
+    let controlTurma: Array<any> = [];
     let data = {
       Total: 0,
       Enviado: 0,
@@ -87,11 +96,31 @@ export default function Relatorios() {
       //         : [cell["Enviar para "]]
       //     )
       //   );
+      const currentTurma =
+        cell.Mensagem.split("").slice(63, 73)[7] == " "
+          ? cell.Mensagem.split("").slice(63, 70).join("")
+          : cell.Mensagem.split("").slice(63, 77).join("").includes("TEC")
+          ? cell.Mensagem.split("").slice(63, 77).join("")
+          : cell.Mensagem.split("").slice(63, 73).join("");
+      if (!controlTurma.find((x: any) => x.turma == currentTurma))
+        controlTurma.push({ turma: currentTurma, alunos: [cell] });
+      else {
+        const currentAluno = controlTurma.findIndex(
+          (x) => x.turma == currentTurma
+        );
+        controlTurma[currentAluno] = {
+          turma: currentTurma,
+          alunos: [...controlTurma[currentAluno].alunos, cell],
+        };
+      }
+      setSchollData(controlTurma);
       return cell;
     });
-    localStorage.setItem("numeros invalidos", JSON.stringify(control));
-    setFormatedSumariSheet(newArr);
+    console.log("CONTROL", control);
+    localStorage.setItem("numeros-invalidos", JSON.stringify(control));
+    setSumariSheetFiles("");
     setSumariData(data);
+    console.log(controlTurma.sort());
     console.log(data, [...newArr]);
   };
 
@@ -111,40 +140,63 @@ export default function Relatorios() {
                 for (let i = 0; i < input.target.files.length; i++) {
                   setTimeout(() => {
                     setSumariSheetFiles(input.target.files[i]);
-                  }, 100 * i);
+                    if (i == input.target.files.length - 1) {
+                      setTimeout(() => {
+                        setSumariSheetFiles(undefined);
+                        setUpdateSheet(updateSheet + 1);
+                      }, 50 * i);
+                    }
+                  }, 50 * i);
                 }
               }}
             />
           </InputFileReceiver>
-          <DownloadButton
-            onClick={() => {
-              MakeSumari();
-            }}
-          >
+          <RelatorioDataContainer>
+            <label>
+              <input type="date"></input>
+            </label>
+            <label>
+              <select>
+                <option>Manhã</option>
+                <option>Tarde</option>
+                <option>Dia</option>
+                <option>Semana</option>
+              </select>
+            </label>
+          </RelatorioDataContainer>
+          <DownloadButton onClick={() => {}}>
             <p>Gerar Relatorio</p>
             <FaFileArrowDown />
           </DownloadButton>
         </ButtonsDiv>
         <RelatoryContainer>
-          {formatedSumariSheet
-            ? formatedSumariSheet?.map((cell, index) => {
+          {schollData
+            ? schollData?.map((cell, index) => {
+                const invalido = cell.alunos.filter(
+                  (x: any) => x.Status == "Número Whatsapp inválido"
+                );
+                const enviado = cell.alunos.filter(
+                  (x: any) => x.Status == "Enviado"
+                );
                 return (
                   <div key={index}>
-                    <div>{cell["Enviar para "]}</div>
-                    <div>{cell["Status"]}</div>
-                    <div>{cell["Data e Hora"]}</div>
+                    <div>{cell.turma}</div>
+                    <div>Total: {cell.alunos.length}</div>
+                    <div>Inválido: {invalido.length}</div>
+                    <div>Enviado: {enviado.length}</div>
                   </div>
                 );
               })
             : null}
         </RelatoryContainer>
-        <div>
+        <Footer>
           <div>Total {sumariData.Total}</div>
           <div>Enviado {sumariData.Enviado}</div>
           <div>Fracassado {sumariData.Fracassado}</div>
           <div>Invalido {sumariData.Invalido}</div>
           <div>Número inválido {sumariData["Número inválido "]}</div>
-        </div>
+          <div>Respondido {sumariData["Número inválido "]}</div>
+        </Footer>
       </MainDiv>
     </>
   );

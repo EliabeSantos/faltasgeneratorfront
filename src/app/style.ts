@@ -40,10 +40,11 @@ export const FilterCellContainer = styled.div`
   grid-column: span 4;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding-right: 5px;
+  height: 30px;
+  gap: 5px;
 `;
 export const FilterCell = styled.label`
-  font-size: 20px;
+  font-size: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,7 +53,7 @@ export const FilterCell = styled.label`
     max-width: 40px;
     min-width: 40px;
     margin-right: 3px;
-    height: 30px;
+    height: 20px;
     margin-left: auto;
   }
   @media (max-width: 700px) {
@@ -73,10 +74,12 @@ export const NameSearch = styled.label`
   display: flex;
   border: 2px solid #ff9f1c;
   flex-direction: column;
+  height: 30px;
   > input {
     width: 100%;
     margin-left: auto;
     margin-right: 3px;
+    height: 100%;
   }
   @media (max-width: 700px) {
     grid-column: span 3;
@@ -89,6 +92,7 @@ export const DownloadButton = styled.button`
   text-align: center;
   grid-column: span 4;
   display: flex;
+  height: 30px;
   justify-content: center;
   align-items: center;
   background-color: rgb(134, 205, 130);
@@ -114,6 +118,7 @@ export const CopyText = styled.button`
   background-color: rgb(134, 205, 130);
   color: white;
   display: flex;
+  height: 30px;
   justify-content: center;
   align-items: center;
   p {
@@ -133,6 +138,7 @@ export const CopyText = styled.button`
 export const InputFileReceiver = styled.label`
   width: auto;
   border: 2px solid #666b6a;
+  height: 30px;
   text-align: center;
   align-items: center;
   justify-content: center;
@@ -207,11 +213,16 @@ export const AlunoDiv = styled.label<CSinput>`
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   border: 2px solid #ff9f1c;
-  max-height: 46px;
-  background-color: ${(props) => (props.invalido ? "#ff9f1c" : "")};
-  padding: 3px;
-  > input {
-  }
+  max-height: 42px;
+  background-color: ${(props) =>
+    props.valid == "true"
+      ? "#ff9f1c"
+      : props.atestado == "true"
+      ? "#219ebc"
+      : ""};
+  padding: 0 4px;
+  padding-bottom: 4px;
+
   > div {
     display: flex;
     align-items: center;
@@ -219,20 +230,59 @@ export const AlunoDiv = styled.label<CSinput>`
     min-height: 40px;
   }
   :nth-child(2) {
-    grid-column: span 8;
+    grid-column: span 7;
     font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis !important;
     max-width: 100%;
   }
+  .edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .edit-input {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    > input {
+      height: 30px;
+      width: 100%;
+    }
+  }
 `;
 interface CSinput {
-  invalido: boolean;
+  valid: string;
+  atestado: string;
 }
 export const CustumizedInput = styled.input`
   max-width: 25px;
   min-width: 25px;
   margin-left: auto;
   margin-right: 3px;
+`;
+
+export const NavContainer = styled.div`
+  width: 100%;
+  grid-column: span 10;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
+  > button {
+    grid-column: span 1;
+    border: 2px solid #ff9f1c;
+  }
+  > div {
+    grid-column: span 8;
+    display: flex;
+    flex-direction: row-reverse;
+    > a {
+      grid-column: span 1;
+      border: 2px solid #ff9f1c;
+      height: 100%;
+      padding: 0 5px;
+    }
+  }
 `;

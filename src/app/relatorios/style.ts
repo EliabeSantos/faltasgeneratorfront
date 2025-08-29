@@ -87,11 +87,34 @@ export const DownloadButton = styled.button`
   width: auto;
   padding: 10px;
   text-align: center;
-  grid-column: span 4;
+  grid-column: span 2;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgb(134, 205, 130);
+  color: white;
+  p {
+    margin-right: 10px;
+  }
+  @media (max-width: 700px) {
+    grid-column: span 1;
+    svg {
+      font-size: 24px;
+    }
+    > p {
+      display: none;
+    }
+  }
+`;
+export const RelatorioDataContainer = styled.div`
+  width: auto;
+  padding: 10px;
+  text-align: center;
+  grid-column: span 6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ff9f1c;
   color: white;
   p {
     margin-right: 10px;
@@ -136,7 +159,7 @@ export const InputFileReceiver = styled.label`
   text-align: center;
   align-items: center;
   justify-content: center;
-  grid-column: span 4;
+  grid-column: span 2;
   display: flex;
   > input {
     display: none;
@@ -228,5 +251,17 @@ export const AlunoDiv = styled.label`
     overflow: hidden;
     text-overflow: ellipsis !important;
     max-width: 100%;
+  }
+`;
+export const Footer = styled.div`
+  position: fixed;
+  bottom: 0;
+  height: 4rem;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(6, 1fr);
+  > div {
+    display: flex;
+    align-items: center;
   }
 `;

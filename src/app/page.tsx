@@ -1,9 +1,10 @@
 "use client";
-import axios from "axios";
 import * as XLSX from "xlsx";
-import readXlsFile from "read-excel-file";
-import { InputEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaFileArrowUp, FaFileArrowDown, FaCopy } from "react-icons/fa6";
+import { FaEdit } from "react-icons/fa";
+import { IoIosCloseCircleOutline } from "react-icons/io";
+import Link from "next/link";
 import {
   AlunoDiv,
   ButtonsDiv,
@@ -16,9 +17,11 @@ import {
   InputFileReceiver,
   MainDiv,
   NameSearch,
+  NavContainer,
   RelatoryContainer,
   TurmaDiv,
 } from "./style";
+
 export default function Home() {
   const [FullList, setFullList] = useState<Array<any>>([]);
   const [filter, setFilter] = useState<Array<any>>([]);
@@ -26,6 +29,8 @@ export default function Home() {
   const [SelectedStudents, setSelectedStudents] = useState<Array<any>>([]);
   const [filterByName, setFilterByName] = useState<string>("");
   const [invalidNumber, setInvalidNumber] = useState<Array<any>>([]);
+  const [dontSendMessage, setDontSendMessage] = useState<Array<any>>([]);
+  const [atestado, setAtestado] = useState<string>("");
 
   const downloadCsv = async () => {
     const rows = SelectedStudents;
@@ -33,11 +38,29 @@ export default function Home() {
     let csvContent = "data:text/csv;charset=utf-8,";
 
     rows.forEach(function (rowArray) {
+      for (let i = 0; i < dontSendMessage.length; i++) {
+        if (
+          dontSendMessage[i][0].replace(/[^A-Za-z0-9]/g, "") ==
+          rowArray[0].replace(/[^A-Za-z0-9]/g, "")
+        ) {
+          const atestadoDate = new Date(dontSendMessage[i][2]);
+          if (atestadoDate.getTime() - new Date().getTime() < 0) {
+            const filtered = dontSendMessage.filter(
+              (x) =>
+                x[0].replace(/[^A-Za-z0-9]/g, "") !=
+                rowArray[0].replace(/[^A-Za-z0-9]/g, "")
+            );
+            localStorage.setItem("atestados", JSON.stringify(filtered));
+            setDontSendMessage(filtered);
+          } else {
+            return;
+          }
+        }
+      }
       const row = rowArray.join(",");
       csvContent += row + "\r\n";
     });
     let encodedUri = encodeURI(csvContent);
-    // window.open(encodedUri);
     encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -46,8 +69,7 @@ export default function Home() {
       "download",
       "Alunos Faltantes" + today.toLocaleDateString("pt-br")
     );
-    document.body.appendChild(link); // Required for FF
-
+    document.body.appendChild(link);
     link.click();
   };
   /* eslint prefer-const: ["error", { ignoreReadBeforeAssign: true }] */
@@ -66,11 +88,20 @@ export default function Home() {
   useEffect(() => {
     console.log(SelectedStudents);
     const NumerosInvalidos = JSON.parse(
-      localStorage.getItem("numeros invalidos")!
+      localStorage.getItem("numeros-invalidos")!
     );
     setInvalidNumber(NumerosInvalidos);
     console.log(NumerosInvalidos);
   }, [SelectedStudents]);
+
+  useEffect(() => {
+    if (
+      !dontSendMessage.length &&
+      JSON.parse(localStorage.getItem("atestados")!)?.length
+    )
+      setDontSendMessage(JSON.parse(localStorage.getItem("atestados")!));
+    console.log("dontSendMessage", dontSendMessage);
+  }, [dontSendMessage]);
 
   return (
     <MainDiv>
@@ -86,16 +117,14 @@ export default function Home() {
                 const reader = new FileReader();
                 reader.onload = (e: any) => {
                   const data = new Uint8Array(e.target.result);
-                  // Process data with SheetJS
                   const workbook = XLSX.read(data, { type: "array" });
                   const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                  // ... further processing
                   const sheetToJson: any = XLSX.utils.sheet_to_json(worksheet);
-                  console.log(sheetToJson);
                   const arr: any = [];
                   const controlArr: any = [];
                   let y = -1;
                   let skip = false;
+                  console.log(sheetToJson);
                   for (let i = 0; i < sheetToJson.length; i++) {
                     if (sheetToJson[i]["__EMPTY_2"]) {
                       if (
@@ -131,7 +160,7 @@ export default function Home() {
                           ? sheetToJson[i]["__EMPTY_5"] +
                             " " +
                             sheetToJson[i]["__EMPTY_13"] +
-                            "TEC"
+                            "TEC "
                           : sheetToJson[i]["__EMPTY_5"] +
                             " " +
                             sheetToJson[i]["__EMPTY_13"];
@@ -141,9 +170,12 @@ export default function Home() {
                           );
                         arr.push({
                           curso: curso,
+                          periodo: sheetToJson[i]["__EMPTY_10"].replace(
+                            "Turno: ",
+                            ""
+                          ),
                           alunos: [],
                         });
-                        console.log("TEST", controlArr);
                         y++;
                       }
                       if (
@@ -169,7 +201,6 @@ export default function Home() {
                           ?.toLowerCase()
                           .includes("profissional")
                       ) {
-                        console.log("test");
                         skip = true;
                       }
                     }
@@ -180,10 +211,28 @@ export default function Home() {
                           .includes("matriculado") &&
                         skip == false
                       ) {
-                        arr[y]?.alunos.push(sheetToJson[i]);
+                        console.log();
+                        const invalid = invalidNumber?.find(
+                          (x: any) =>
+                            x ==
+                            sheetToJson[i]["__EMPTY_8"].replace(
+                              /[^A-Za-z0-9]/g,
+                              ""
+                            )
+                        );
+                        const hasAtestado = dontSendMessage.find(
+                          (x) => x[0] == sheetToJson[i]["__EMPTY_8"]
+                        );
+                        arr[y]?.alunos.push({
+                          ...sheetToJson[i],
+                          invalido: invalid ? true : false,
+                          atestado: hasAtestado ? true : false,
+                        });
                       }
                     }
                   }
+                  console.log(arr);
+                  localStorage.setItem(arr[0].periodo, JSON.stringify(arr));
                   setFullList(arr);
                   setFilter(controlArr);
                 };
@@ -216,7 +265,7 @@ Para outros assuntos, entre em contato com a secretaria pelo número (41) 99501-
 
 Atenciosamente,
 Equipe Pedagógica
-Colégio Estadial Leocádia Braga Ramos 
+Colégio Estadual Leocádia Braga Ramos 
 `
               );
             }}
@@ -249,59 +298,118 @@ Colégio Estadial Leocádia Braga Ramos
           </FilterCellContainer>
           {filter != undefined && FullList.length > 0 && (
             <NameSearch>
-              Nome Aluno
-              <input onChange={(e) => debounce(e.target.value)}></input>
+              <input
+                placeholder="Nome do aluno"
+                onChange={(e) => debounce(e.target.value)}
+              ></input>
             </NameSearch>
           )}
+          <NavContainer>
+            <button
+              onClick={() => {
+                const manha = JSON.parse(localStorage.getItem("Manhã")!);
+                setFullList(manha);
+              }}
+            >
+              Manhã
+            </button>
+            <button
+              onClick={() => {
+                const tarde = JSON.parse(localStorage.getItem("Tarde")!);
+                setFullList(tarde);
+              }}
+            >
+              Tarde
+            </button>
+            <div>
+              <Link href={"/relatorios"}>Relatorios</Link>
+            </div>
+          </NavContainer>
         </ButtonsDiv>
 
         <Container>
           {FullList && selectedFilter != undefined && filterByName != undefined
-            ? FullList?.map((x, index) => {
+            ? FullList?.map((Turma, index) => {
                 if (
                   selectedFilter.length &&
-                  !selectedFilter.find((y) => x?.curso?.includes(y))
+                  !selectedFilter.find((y) => Turma?.curso?.includes(y))
                 )
                   return;
                 return (
                   <TurmaDiv key={index}>
-                    <h1>{x.curso}</h1>
-                    {x.alunos.map((y: any, index: any) => {
-                      if (
-                        filterByName.length &&
-                        !y["__EMPTY_4"]
-                          .toLowerCase()
-                          .includes(filterByName.toLocaleLowerCase())
-                      )
-                        return;
+                    <h1>{Turma.curso}</h1>
+                    {Turma.alunos.map((Aluno: any, index: any) => {
+                      if (filterByName.length)
+                        if (
+                          !Aluno["__EMPTY_4"]
+                            .toLowerCase()
+                            .includes(filterByName.toLocaleLowerCase())
+                        )
+                          return;
+                      const obj = [
+                        Aluno["__EMPTY_8"],
+                        Turma.curso
+                          .replace("Seriação: ", "")
+                          .replace("Turma: ", "") +
+                          "" +
+                          Aluno["__EMPTY_4"],
+                      ];
                       return (
                         <AlunoDiv
-                          invalido={invalidNumber?.find(
-                            (x: any) =>
-                              x == y["__EMPTY_8"].replace(/[^A-Za-z0-9]/g, "")
-                          )}
+                          valid={Aluno.invalido ? "true" : "false"}
+                          atestado={Aluno.atestado ? "true" : "false"}
                           key={index}
                         >
                           <div>
-                            <p>{y["__EMPTY_2"]}</p>
+                            <p>{Aluno["__EMPTY_2"]}</p>
                           </div>
                           <div>
-                            <p>{y["__EMPTY_4"]}</p>
+                            {atestado == Aluno["__EMPTY_4"] ? (
+                              <div className="edit-input">
+                                <input
+                                  type="date"
+                                  onChange={(e: any) => {
+                                    if (
+                                      !dontSendMessage.find((z) =>
+                                        z[1]?.includes(Aluno["__EMPTY_4"])
+                                      )
+                                    ) {
+                                      const newAtestado = [
+                                        ...dontSendMessage,
+                                        [...obj, e.target.value],
+                                      ];
+                                      localStorage.setItem(
+                                        "atestados",
+                                        JSON.stringify(newAtestado)
+                                      );
+                                      setDontSendMessage(newAtestado);
+                                    }
+                                    setAtestado("");
+                                  }}
+                                ></input>
+                              </div>
+                            ) : (
+                              <p>{Aluno["__EMPTY_4"]}</p>
+                            )}
+                          </div>
+                          <div className="edit">
+                            <div
+                              onClick={(e: any) => {
+                                e.preventDefault();
+                                if (!atestado.length)
+                                  setAtestado(Aluno["__EMPTY_4"]);
+                                else setAtestado("");
+                              }}
+                            >
+                              <FaEdit />
+                            </div>
                           </div>
                           <CustumizedInput
                             type="checkbox"
                             onChange={(event) => {
-                              const obj = [
-                                y["__EMPTY_8"],
-                                x.curso
-                                  .replace("Seriação: ", "")
-                                  .replace("Turma: ", "") +
-                                  "" +
-                                  y["__EMPTY_4"],
-                              ];
                               if (
                                 !SelectedStudents.find((z) =>
-                                  z[1]?.includes(y["__EMPTY_4"])
+                                  z[1]?.includes(Aluno["__EMPTY_4"])
                                 )
                               ) {
                                 setSelectedStudents([...SelectedStudents, obj]);
@@ -313,11 +421,14 @@ Colégio Estadial Leocádia Braga Ramos
                                 ]);
                               }
                             }}
-                            defaultChecked={false}
-                            value={y["__EMPTY_4"]}
-                            checked={SelectedStudents.find((z) =>
-                              z[1]?.includes(y["__EMPTY_4"])
-                            )}
+                            value={Aluno["__EMPTY_4"]}
+                            checked={
+                              SelectedStudents.find((z) =>
+                                z[1]?.includes(Aluno["__EMPTY_4"])
+                              )
+                                ? true
+                                : false
+                            }
                           />
                         </AlunoDiv>
                       );
