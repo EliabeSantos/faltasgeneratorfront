@@ -52,6 +52,11 @@ export const DownloadButton = styled.button`
   align-items: center;
   background-color: rgb(134, 205, 130);
   color: white;
+  &:hover {
+    background-color: transparent;
+    border: 2px solid rgb(134, 205, 130);
+    cursor: pointer;
+  }
   p {
     margin-right: 10px;
   }
@@ -162,6 +167,10 @@ export const InputFileReceiver = styled.label`
   display: flex;
   > input {
     display: none;
+  }
+  &:hover {
+    cursor: pointer;
+    background-color: #666b6a;
   }
   @media (max-width: 900px) {
     grid-column: span 2;

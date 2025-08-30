@@ -100,6 +100,11 @@ export const DownloadButton = styled.button`
   p {
     margin-right: 10px;
   }
+  &:hover {
+    background-color: transparent;
+    border: 2px solid rgb(134, 205, 130);
+    cursor: pointer;
+  }
   @media (max-width: 700px) {
     grid-column: span 2;
     svg {
@@ -121,6 +126,11 @@ export const CopyText = styled.button`
   height: 30px;
   justify-content: center;
   align-items: center;
+  &:hover {
+    background-color: transparent;
+    border: 2px solid rgb(134, 205, 130);
+    cursor: pointer;
+  }
   p {
     margin-right: 10px;
   }
@@ -146,6 +156,10 @@ export const InputFileReceiver = styled.label`
   display: flex;
   > input {
     display: none;
+  }
+  &:hover {
+    cursor: pointer;
+    background-color: #666b6a;
   }
   @media (max-width: 700px) {
     grid-column: span 2;
