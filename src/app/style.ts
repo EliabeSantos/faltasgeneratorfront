@@ -275,6 +275,9 @@ export const NavContainer = styled.div`
     grid-column: span 1;
     border: 2px solid #ff9f1c;
   }
+  .filter-button {
+    grid-column: span 2 !important;
+  }
   > div {
     grid-column: span 8;
     display: flex;

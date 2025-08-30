@@ -267,6 +267,7 @@ export default function Home() {
                     `filter-${arr[0].periodo}`,
                     JSON.stringify(controlArr)
                   );
+                  setSelectedPeriod(arr[0].periodo);
                   setFullList(arr);
                   setFilter(controlArr);
                 };
@@ -440,37 +441,47 @@ Colégio Estadual Leocádia Braga Ramos
               ></input>
             </NameSearch>
           )}
-          <NavContainer>
-            <button
-              onClick={() => {
-                setSelectedFilter([]);
-                const manha = JSON.parse(localStorage.getItem("Manhã")!);
-                const manhaFilter = JSON.parse(
-                  localStorage.getItem("filter-Manhã")!
-                );
-                setFullList(manha);
-                setFilter(manhaFilter);
-              }}
-            >
-              Manhã
-            </button>
-            <button
-              onClick={() => {
-                setSelectedFilter([]);
-                const tardeFilter = JSON.parse(
-                  localStorage.getItem("filter-Tarde")!
-                );
-                setFilter(tardeFilter);
 
-                const tarde = JSON.parse(localStorage.getItem("Tarde")!);
-                setFullList(tarde);
-              }}
-            >
-              Tarde
-            </button>
+          <NavContainer>
+            {selectPeriod.length ? (
+              <>
+                {localStorage.getItem("Manhã") ? (
+                  <button
+                    onClick={() => {
+                      setSelectedFilter([]);
+                      const manha = JSON.parse(localStorage.getItem("Manhã")!);
+                      const manhaFilter = JSON.parse(
+                        localStorage.getItem("filter-Manhã")!
+                      );
+                      setFullList(manha);
+                      setFilter(manhaFilter);
+                    }}
+                  >
+                    Manhã
+                  </button>
+                ) : null}
+                {localStorage.getItem("Tarde") ? (
+                  <button
+                    onClick={() => {
+                      setSelectedFilter([]);
+                      const tardeFilter = JSON.parse(
+                        localStorage.getItem("filter-Tarde")!
+                      );
+                      setFilter(tardeFilter);
+
+                      const tarde = JSON.parse(localStorage.getItem("Tarde")!);
+                      setFullList(tarde);
+                    }}
+                  >
+                    Tarde
+                  </button>
+                ) : null}
+              </>
+            ) : (
+              <div className="filter-button"></div>
+            )}
             <div>
               <Link href={"/relatorios"}>Relatorios</Link>
-
               <Link href={"/ajuda"}>Ajuda</Link>
             </div>
           </NavContainer>
@@ -559,6 +570,10 @@ Colégio Estadual Leocádia Braga Ramos
                                       );
                                       setDontSendMessage(newAtestado);
                                     }
+                                    localStorage.setItem(
+                                      selectPeriod,
+                                      JSON.stringify(newList)
+                                    );
                                     setFullList(newList);
                                     setSelectedDate("");
                                     setAtestado("");
