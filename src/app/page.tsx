@@ -29,6 +29,7 @@ export default function Home() {
   const [invalidNumber, setInvalidNumber] = useState<Array<any>>([]);
   const [dontSendMessage, setDontSendMessage] = useState<Array<any>>([]);
   const [atestado, setAtestado] = useState<string>("");
+  const [selectPeriod, setSelectedPeriod] = useState<string>("");
 
   const downloadCsv = async () => {
     const rows = SelectedStudents;
@@ -91,27 +92,41 @@ export default function Home() {
     setInvalidNumber(NumerosInvalidos);
     console.log(NumerosInvalidos);
   }, [SelectedStudents]);
-
   useEffect(() => {
     if (
       !dontSendMessage.length &&
       JSON.parse(localStorage.getItem("atestados")!)?.length
     )
       setDontSendMessage(JSON.parse(localStorage.getItem("atestados")!));
-    console.log("dontSendMessage", dontSendMessage);
   }, [dontSendMessage]);
+  useEffect(() => {
+    if (
+      !selectPeriod.length &&
+      JSON.parse(localStorage.getItem("SelectedPeriod")!)?.length
+    )
+      setSelectedPeriod(JSON.parse(localStorage.getItem("SelectedPeriod")!));
+  }, [selectPeriod]);
 
+  function SortArrayByNumber(a: any, b: any) {
+    return a.turma.slice(0, 1).localeCompare(b.turma.slice(0, 1));
+  }
+  function SortArrayByLetter(a: any, b: any) {
+    if (a.turma.includes("Série"))
+      return a.turma.slice(8, 10).localeCompare(b.turma.slice(8, 10));
+    else return a.turma.slice(5, 7).localeCompare(b.turma.slice(5, 7));
+  }
   return (
     <MainDiv>
       <>
         <ButtonsDiv>
           <InputFileReceiver>
-            <p>Selecione o arquivo</p>
+            <p>Arquivo de alunos</p>
             <FaFileArrowUp id="IconSelectFile"></FaFileArrowUp>
             <input
               type="file"
               id="input"
               onChange={(input: any) => {
+                setSelectedStudents([]);
                 const reader = new FileReader();
                 reader.onload = (e: any) => {
                   const data = new Uint8Array(e.target.result);
@@ -122,7 +137,6 @@ export default function Home() {
                   const controlArr: any = [];
                   let y = -1;
                   let skip = false;
-                  console.log(sheetToJson);
                   for (let i = 0; i < sheetToJson.length; i++) {
                     if (sheetToJson[i]["__EMPTY_2"]) {
                       if (
@@ -229,10 +243,102 @@ export default function Home() {
                       }
                     }
                   }
-                  console.log(arr);
                   localStorage.setItem(arr[0].periodo, JSON.stringify(arr));
+                  localStorage.setItem(
+                    "SelectedPeriod",
+                    JSON.stringify(arr[0].periodo)
+                  );
                   setFullList(arr);
                   setFilter(controlArr);
+                };
+                reader.readAsArrayBuffer(input.target.files[0]);
+              }}
+            />
+          </InputFileReceiver>
+
+          <InputFileReceiver>
+            <p>Arquivo de faltas</p>
+            <FaFileArrowUp id="IconSelectFile"></FaFileArrowUp>
+            <input
+              type="file"
+              id="input"
+              onChange={(input: any) => {
+                const reader = new FileReader();
+                reader.onload = (e: any) => {
+                  const data = new Uint8Array(e.target.result);
+                  const workbook = XLSX.read(data, { type: "array" });
+                  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                  const sheetToJson: any = XLSX.utils.sheet_to_json(worksheet);
+                  console.log(sheetToJson);
+                  const filteredList = sheetToJson
+                    .filter(
+                      (falta: any) =>
+                        falta.numAula == 2 && falta.turma.includes(selectPeriod)
+                    )
+                    .filter(
+                      (falta: any, index: any, prev: any) =>
+                        prev[index - 1]?.cgm != falta?.cgm
+                    )
+                    .sort((a: any, b: any) => SortArrayByNumber(a, b));
+                  const faltas: Array<any> = [];
+
+                  for (let i = 0; i < filteredList.length; i++) {
+                    const currentTurma = filteredList[i].turma.includes("Ano")
+                      ? filteredList[i].turma.slice(0, 7)
+                      : filteredList[i].turma.slice(0, 10);
+                    if (!faltas.find((x) => x?.turma == currentTurma))
+                      faltas.push({
+                        turma: currentTurma,
+                        alunos: [],
+                      });
+                    faltas[
+                      faltas.findIndex((x) => x.turma == currentTurma)
+                    ].alunos.push(filteredList[i]);
+                  }
+                  const controlArr: Array<any> = [];
+
+                  for (let i = 0; i < FullList.length; i++) {
+                    const currentTurma = FullList[i].curso?.turma?.includes(
+                      "Ano"
+                    )
+                      ? FullList[i]?.curso
+                          .slice(10, 21)
+                          .replace("Turma: ", "")
+                          .trim()
+                      : FullList[i]?.curso
+                          .slice(10, 27)
+                          .replace("Turma: ", "")
+                          .trim();
+
+                    const currentTurmaStudents =
+                      faltas[
+                        faltas.findIndex(
+                          (x) =>
+                            x?.turma.toLocaleLowerCase("pt-br") ==
+                            currentTurma?.toLocaleLowerCase("pt-br")
+                        )
+                      ];
+                    for (let y = 0; y < FullList[i].alunos.length; y++) {
+                      if (
+                        currentTurmaStudents?.alunos?.find(
+                          (x: any) =>
+                            x.cgm == FullList[i].alunos[y]["__EMPTY_3"]
+                        )
+                      ) {
+                        const obj = [
+                          FullList[i].alunos[y]["__EMPTY_8"],
+                          FullList[i].curso
+                            .replace("Seriação: ", "")
+                            .replace("Turma: ", "") +
+                            "" +
+                            FullList[i].alunos[y]["__EMPTY_4"],
+                        ];
+                        controlArr.push(obj);
+                      }
+                    }
+                  }
+                  console.log(controlArr, faltas);
+                  setSelectedStudents(controlArr);
                 };
                 reader.readAsArrayBuffer(input.target.files[0]);
               }}

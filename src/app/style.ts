@@ -142,7 +142,7 @@ export const InputFileReceiver = styled.label`
   text-align: center;
   align-items: center;
   justify-content: center;
-  grid-column: span 4;
+  grid-column: span 2;
   display: flex;
   > input {
     display: none;
@@ -157,6 +157,7 @@ export const InputFileReceiver = styled.label`
     }
   }
 `;
+
 export const Container = styled.div`
   display: grid;
   @media (max-width: 2000px) {
