@@ -30,7 +30,12 @@ export default function Home() {
   const [dontSendMessage, setDontSendMessage] = useState<Array<any>>([]);
   const [atestado, setAtestado] = useState<string>("");
   const [selectPeriod, setSelectedPeriod] = useState<string>("");
-
+  const options: any = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  };
+  const dateTimeFormat1 = new Intl.DateTimeFormat("pt-br", options);
   const downloadCsv = async () => {
     const rows = SelectedStudents;
 
@@ -66,7 +71,7 @@ export default function Home() {
     const today = new Date();
     link.setAttribute(
       "download",
-      "Alunos Faltantes" + today.toLocaleDateString("pt-br")
+      "Alunos Faltantes" + dateTimeFormat1.format(today)
     );
     document.body.appendChild(link);
     link.click();

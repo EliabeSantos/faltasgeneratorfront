@@ -77,10 +77,21 @@ export const SidePage = styled.aside`
   > div {
     border: 1px solid #ff9f1c;
     margin-bottom: 3px;
+    position: relative;
+    > svg {
+      position: absolute;
+      right: 5px;
+      top: calc(50% - 11px);
+      font-size: 22px;
+      :hover {
+        color: red;
+        cursor: pointer;
+      }
+    }
   }
 `;
 export const InputsContainer = styled.div`
-  grid-column: span 4;
+  grid-column: span 2;
   display: flex;
   justify-content: center;
   align-items: center;

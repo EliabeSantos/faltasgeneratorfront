@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { FaFileArrowUp, FaFileArrowDown } from "react-icons/fa6";
+import { IoMdCloseCircle } from "react-icons/io";
 import {
   ButtonsDiv,
   DownloadButton,
@@ -30,6 +31,8 @@ export default function Relatorios() {
   const [sumaryDate, setSumaryDate] = useState<string>("");
   const [sumariData, setSumariData] = useState<any>({});
   const [sumariSheetFiles, setSumariSheetFiles] = useState<any>();
+  const [responseFiles, setResponseFiles] = useState<any>();
+  const [filteredResponses, setFilteredResponses] = useState<Array<any>>([]);
   const [sumariCount, setSumaryCount] = useState<data>({
     total: 0,
     enviado: 0,
@@ -37,6 +40,12 @@ export default function Relatorios() {
     fracassado: 0,
     respondido: 0,
   });
+  const options: any = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  };
+  const dateTimeFormat1 = new Intl.DateTimeFormat("pt-br", options);
   useEffect(() => {
     if (sumariSheetFiles != undefined) {
       ReadSumaries();
@@ -44,7 +53,6 @@ export default function Relatorios() {
     if (updateSheet) {
       MakeSumari();
     }
-    console.log(schollData);
   }, [sumariSheetFiles]);
 
   useEffect(() => {
@@ -52,14 +60,9 @@ export default function Relatorios() {
       let enviado = 0;
       let invalido = 0;
       let fracassado = 0;
-      const respondido = 0;
+      let respondido = 0;
 
       for (let i = 0; i < schollData.length; i++) {
-        console.log(
-          "DATA",
-          schollData[i],
-          schollData[i].alunos.filter((x: any) => x.Status == "Enviado").length
-        );
         enviado += schollData[i].alunos.filter(
           (x: any) => x.Status == "Enviado"
         ).length;
@@ -69,15 +72,21 @@ export default function Relatorios() {
         fracassado += schollData[i].alunos.filter(
           (x: any) => x.Status == ""
         ).length;
+        console.log(
+          schollData[i]?.justificativas,
+          schollData[i]?.justificativas?.length + respondido
+        );
+        respondido += schollData[i]?.justificativas
+          ? schollData[i]?.justificativas?.length
+          : 0;
       }
       setSumaryCount({
-        total: invalido + enviado + fracassado + respondido,
+        total: invalido + enviado + fracassado,
         invalido: invalido,
         enviado: enviado,
         fracassado: fracassado,
         respondido: respondido,
       });
-      console.log(enviado, invalido);
     }
   }, [schollData]);
 
@@ -150,15 +159,22 @@ export default function Relatorios() {
           : cell.Mensagem.split("").slice(63, 77).join("").includes("TEC")
           ? cell.Mensagem.split("").slice(63, 77).join("")
           : cell.Mensagem.split("").slice(63, 73).join("");
+      const newCell = {
+        ...cell,
+        Mensagem: currentTurma.includes("TEC")
+          ? cell.Mensagem.split(" ").slice(11, 13).join(" ")
+          : cell.Mensagem.split(" ").slice(10, 12).join(" "),
+      };
       if (!controlTurma.find((x: any) => x.turma == currentTurma))
-        controlTurma.push({ turma: currentTurma, alunos: [cell] });
+        controlTurma.push({ turma: currentTurma, alunos: [newCell] });
       else {
         const currentAluno = controlTurma.findIndex(
           (x) => x.turma == currentTurma
         );
         controlTurma[currentAluno] = {
           turma: currentTurma,
-          alunos: [...controlTurma[currentAluno].alunos, cell],
+          alunos: [...controlTurma[currentAluno].alunos, newCell],
+          justificativas: [],
         };
       }
       setSchollData(controlTurma);
@@ -169,18 +185,50 @@ export default function Relatorios() {
     setSumariData(data);
   };
 
+  const ReadResponses = async () => {
+    const rawText = await responseFiles.text();
+    const data = schollData;
+    for (let i = 0; i < schollData.length; i++) {
+      const filtered = rawText
+        .split("\n")
+        .filter((x: any) => x?.includes(schollData[i].turma));
+      filtered.length
+        ? (data[i] = { ...data[i], justificativas: filtered })
+        : null;
+    }
+    setSchollData([...data]);
+    setFilteredResponses([...filteredResponses, ...rawText.split("\n")]);
+    setSumaryCount({
+      ...sumariCount,
+      respondido: sumariCount.respondido + rawText.split("\n").length,
+    });
+    setResponseFiles("");
+  };
+  useEffect(() => {
+    if (responseFiles) ReadResponses();
+  }, [responseFiles]);
   return (
     <>
       <MainDiv>
         <ButtonsDiv>
           <InputFileReceiver>
-            <p>Selecione o arquivo</p>
+            <p>Relatório de envio</p>
             <FaFileArrowUp id="IconSelectFile"></FaFileArrowUp>
             <input
               type="file"
               id="input"
               multiple
               onChange={(input: any) => {
+                setSumariData([]);
+                setSumariSheet([]);
+                setSchollData([]);
+                setSumaryCount({
+                  total: 0,
+                  enviado: 0,
+                  invalido: 0,
+                  fracassado: 0,
+                  respondido: 0,
+                });
                 for (let i = 0; i < input.target.files.length; i++) {
                   setTimeout(() => {
                     setSumariSheetFiles(input.target.files[i]);
@@ -195,7 +243,27 @@ export default function Relatorios() {
               }}
             />
           </InputFileReceiver>
-
+          <InputFileReceiver>
+            <p>Respostas</p>
+            <FaFileArrowUp id="IconSelectFile"></FaFileArrowUp>
+            <input
+              type="file"
+              id="input"
+              multiple
+              onChange={(input: any) => {
+                for (let i = 0; i < input.target.files.length; i++) {
+                  setTimeout(() => {
+                    setResponseFiles(input.target.files[i]);
+                    if (i == input.target.files.length - 1) {
+                      setTimeout(() => {
+                        setResponseFiles(undefined);
+                      }, 50 * i + 1);
+                    }
+                  }, 50 * i + 1);
+                }
+              }}
+            />
+          </InputFileReceiver>
           <InputsContainer>
             <label>
               <input
@@ -216,25 +284,19 @@ export default function Relatorios() {
           </InputsContainer>
           <DownloadButton
             onClick={() => {
-              console.log({
-                type: sumaryType,
-                date: sumaryDate,
-                data: schollData,
-              });
               const savedData = localStorage.getItem("SavedSumaryData")
                 ? JSON.parse(localStorage.getItem("SavedSumaryData")!)
                 : [];
-              localStorage.setItem(
-                "SavedSumaryData",
-                JSON.stringify([
-                  ...savedData,
-                  {
-                    type: sumaryType,
-                    date: sumaryDate,
-                    data: schollData,
-                  },
-                ])
-              );
+              const newData = [
+                ...savedData,
+                {
+                  type: sumaryType,
+                  date: sumaryDate,
+                  data: schollData,
+                },
+              ];
+              localStorage.setItem("SavedSumaryData", JSON.stringify(newData));
+              setSavedData(newData);
             }}
           >
             <p>Gerar Relatorio</p>
@@ -263,8 +325,23 @@ export default function Relatorios() {
                     setSchollData(data.data);
                   }}
                 >
-                  <p>Type: {data.type}</p>
-                  <p>Data: {data.date}</p>
+                  <p>Tipo: {data.type}</p>
+                  <p>Data: {dateTimeFormat1.format(new Date(data.date))}</p>
+                  <IoMdCloseCircle
+                    onClick={() => {
+                      const savedData = localStorage.getItem("SavedSumaryData")
+                        ? JSON.parse(localStorage.getItem("SavedSumaryData")!)
+                        : [];
+                      const newData = savedData.filter(
+                        (x: any, i: any) => i != index
+                      );
+                      localStorage.setItem(
+                        "SavedSumaryData",
+                        JSON.stringify(newData)
+                      );
+                      setSavedData(newData);
+                    }}
+                  />
                 </div>
               );
             })}
@@ -278,12 +355,14 @@ export default function Relatorios() {
                   const enviado = cell.alunos.filter(
                     (x: any) => x.Status == "Enviado"
                   );
+
                   return (
                     <div key={index}>
                       <div>{cell.turma}</div>
                       <div>Total: {cell.alunos.length}</div>
                       <div>Inválido: {invalido.length}</div>
                       <div>Enviado: {enviado.length}</div>
+                      <div>Respondido: {cell?.justificativas?.length}</div>
                     </div>
                   );
                 })
@@ -296,8 +375,7 @@ export default function Relatorios() {
           <div>Enviado {sumariCount.enviado}</div>
           <div>Fracassado {sumariCount.fracassado}</div>
           <div>Invalido {sumariCount.invalido}</div>
-          <div>Número inválido {sumariData["Número inválido "]}</div>
-          <div>Respondido {sumariData["Número inválido "]}</div>
+          <div>Respondido {sumariCount.respondido}</div>
         </Footer>
       </MainDiv>
     </>
