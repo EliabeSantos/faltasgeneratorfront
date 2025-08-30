@@ -12,7 +12,7 @@ export const MainDiv = styled.div`
 
   position: relative;
   @media (max-width: 700px) {
-    padding-top: 130px;
+    padding-top: 160px;
   }
 `;
 
@@ -101,12 +101,12 @@ export const DownloadButton = styled.button`
     margin-right: 10px;
   }
   @media (max-width: 700px) {
-    grid-column: span 1;
+    grid-column: span 2;
     svg {
       font-size: 24px;
     }
     > p {
-      display: none;
+      font-size: 12px;
     }
   }
 `;
@@ -125,9 +125,9 @@ export const CopyText = styled.button`
     margin-right: 10px;
   }
   @media (max-width: 700px) {
-    grid-column: span 1;
+    grid-column: span 2;
     > p {
-      display: none;
+      font-size: 12px;
     }
     svg {
       font-size: 24px;
@@ -153,7 +153,7 @@ export const InputFileReceiver = styled.label`
       font-size: 24px;
     }
     > p {
-      display: none;
+      font-size: 12px;
     }
   }
 `;

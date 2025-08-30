@@ -132,6 +132,7 @@ export default function Home() {
               id="input"
               onChange={(input: any) => {
                 setSelectedStudents([]);
+                setSelectedFilter([]);
                 const reader = new FileReader();
                 reader.onload = (e: any) => {
                   const data = new Uint8Array(e.target.result);
@@ -252,6 +253,10 @@ export default function Home() {
                   localStorage.setItem(
                     "SelectedPeriod",
                     JSON.stringify(arr[0].periodo)
+                  );
+                  localStorage.setItem(
+                    `filter-${arr[0].periodo}`,
+                    JSON.stringify(controlArr)
                   );
                   setFullList(arr);
                   setFilter(controlArr);
@@ -382,29 +387,42 @@ Colégio Estadual Leocádia Braga Ramos
             <p>Copiar Texto</p>
             <FaCopy />
           </CopyText>
-          <FilterCellContainer>
-            {filter
-              ? filter.map((item, index) => {
-                  return (
-                    <FilterCell key={index}>
-                      {item}
-                      <input
-                        type="checkbox"
-                        onChange={(event) => {
-                          console.log("CLICK", event.target.checked);
-                          if (event.target.checked)
-                            setSelectedFilter([...selectedFilter, item]);
-                          else
-                            setSelectedFilter([
-                              ...selectedFilter.filter((x) => x != item),
-                            ]);
-                        }}
-                      ></input>
-                    </FilterCell>
-                  );
-                })
-              : null}
-          </FilterCellContainer>
+          {filter?.length ? (
+            <FilterCellContainer>
+              {filter.map((item, index) => {
+                return (
+                  <FilterCell key={index}>
+                    {item}
+                    <input
+                      type="checkbox"
+                      id={`${item}-${index}`}
+                      checked={
+                        selectedFilter.length
+                          ? selectedFilter.find((x) => x == item)
+                            ? true
+                            : false
+                          : false
+                      }
+                      onChange={(event) => {
+                        console.log(
+                          "CLICK",
+                          event.target.checked,
+                          item,
+                          selectedFilter
+                        );
+                        if (event.target.checked)
+                          setSelectedFilter([...selectedFilter, item]);
+                        else
+                          setSelectedFilter([
+                            ...selectedFilter.filter((x) => x != item),
+                          ]);
+                      }}
+                    ></input>
+                  </FilterCell>
+                );
+              })}
+            </FilterCellContainer>
+          ) : null}
           {filter != undefined && FullList.length > 0 && (
             <NameSearch>
               <input
@@ -416,14 +434,25 @@ Colégio Estadual Leocádia Braga Ramos
           <NavContainer>
             <button
               onClick={() => {
+                setSelectedFilter([]);
                 const manha = JSON.parse(localStorage.getItem("Manhã")!);
+                const manhaFilter = JSON.parse(
+                  localStorage.getItem("filter-Manhã")!
+                );
                 setFullList(manha);
+                setFilter(manhaFilter);
               }}
             >
               Manhã
             </button>
             <button
               onClick={() => {
+                setSelectedFilter([]);
+                const tardeFilter = JSON.parse(
+                  localStorage.getItem("filter-Tarde")!
+                );
+                setFilter(tardeFilter);
+
                 const tarde = JSON.parse(localStorage.getItem("Tarde")!);
                 setFullList(tarde);
               }}

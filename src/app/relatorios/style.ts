@@ -30,10 +30,10 @@ export const ButtonsDiv = styled.div`
   p {
     margin-right: 10px;
   }
-  @media (max-width: 700px) {
-    grid-template-columns: repeat(3, 1fr) !important;
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(4, 1fr) !important;
     > p {
-      display: none;
+      font-size: 12px;
     }
   }
 `;
@@ -52,14 +52,16 @@ export const DownloadButton = styled.button`
   p {
     margin-right: 10px;
   }
-  @media (max-width: 700px) {
-    grid-column: span 1;
+  @media (max-width: 900px) {
     svg {
       font-size: 24px;
     }
     > p {
-      display: none;
+      font-size: 12px;
     }
+  }
+  @media (max-width: 500px) {
+    grid-column: span 4;
   }
 `;
 export const MainPageContainer = styled.div`
@@ -72,22 +74,30 @@ export const MainPageContainer = styled.div`
 export const SidePage = styled.aside`
   width: 100%;
   display: flex;
-  flex-direction: column;
-  grid-column: span 2;
+
   > div {
     border: 1px solid #ff9f1c;
     margin-bottom: 3px;
     position: relative;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     > svg {
       position: absolute;
       right: 5px;
-      top: calc(50% - 11px);
+      top: calc(5px);
       font-size: 22px;
       :hover {
         color: red;
         cursor: pointer;
       }
     }
+  }
+  .card:hover {
+    cursor: pointer;
+    background-color: #ff9f1c;
   }
 `;
 export const InputsContainer = styled.div`
@@ -103,14 +113,16 @@ export const InputsContainer = styled.div`
   p {
     margin-right: 10px;
   }
-  @media (max-width: 700px) {
-    grid-column: span 1;
+  @media (max-width: 900px) {
     svg {
       font-size: 24px;
     }
     > p {
-      display: none;
+      font-size: 12px;
     }
+  }
+  @media (max-width: 500px) {
+    grid-column: span 4;
   }
 `;
 export const CopyText = styled.button`
@@ -148,14 +160,17 @@ export const InputFileReceiver = styled.label`
   > input {
     display: none;
   }
-  @media (max-width: 700px) {
-    grid-column: span 1;
+  @media (max-width: 900px) {
+    grid-column: span 2;
     svg {
       font-size: 24px;
     }
     > p {
-      display: none;
+      font-size: 12px;
     }
+  }
+  @media (max-width: 900px) {
+    grid-column: span 2;
   }
 `;
 export const Container = styled.div`
@@ -242,14 +257,26 @@ export const AlunoDiv = styled.label`
 `;
 export const Footer = styled.div`
   position: fixed;
+
   bottom: 0;
-  height: 4rem;
+  height: 10rem;
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(6, 1fr);
-  padding-left: 50px;
-  > div {
+  grid-template-columns: repeat(5, 1fr);
+  .cell {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    @media (max-width: 500px) {
+      font-size: 12px;
+    }
+  }
+  .list {
+    grid-column: span 5;
+    position: relative;
+    max-width: 100vw;
+    overflow: auto;
+    display: flex;
   }
 `;

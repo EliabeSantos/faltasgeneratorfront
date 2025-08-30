@@ -302,80 +302,85 @@ export default function Relatorios() {
             <p>Gerar Relatorio</p>
             <FaFileArrowDown />
           </DownloadButton>
-          {}
-          <div>
-            <button
-              onClick={() => {
-                setSchollData([]);
-                setSumariSheetFiles(undefined);
-                setSumariSheet([]);
-              }}
-            >
-              Limpar
-            </button>
-          </div>
         </ButtonsDiv>
-        <MainPageContainer>
-          <SidePage>
-            {savedData.map((data, index) => {
-              return (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setSchollData(data.data);
-                  }}
-                >
-                  <p>Tipo: {data.type}</p>
-                  <p>Data: {dateTimeFormat1.format(new Date(data.date))}</p>
-                  <IoMdCloseCircle
-                    onClick={() => {
-                      const savedData = localStorage.getItem("SavedSumaryData")
-                        ? JSON.parse(localStorage.getItem("SavedSumaryData")!)
-                        : [];
-                      const newData = savedData.filter(
-                        (x: any, i: any) => i != index
-                      );
-                      localStorage.setItem(
-                        "SavedSumaryData",
-                        JSON.stringify(newData)
-                      );
-                      setSavedData(newData);
-                    }}
-                  />
-                </div>
-              );
-            })}
-          </SidePage>
-          <RelatoryContainer>
-            {schollData
-              ? schollData?.map((cell, index) => {
-                  const invalido = cell.alunos.filter(
-                    (x: any) => x.Status == "Número Whatsapp inválido"
-                  );
-                  const enviado = cell.alunos.filter(
-                    (x: any) => x.Status == "Enviado"
-                  );
+        <RelatoryContainer>
+          {schollData
+            ? schollData?.map((cell, index) => {
+                const invalido = cell.alunos.filter(
+                  (x: any) => x.Status == "Número Whatsapp inválido"
+                );
+                const enviado = cell.alunos.filter(
+                  (x: any) => x.Status == "Enviado"
+                );
 
-                  return (
-                    <div key={index}>
-                      <div>{cell.turma}</div>
-                      <div>Total: {cell.alunos.length}</div>
-                      <div>Inválido: {invalido.length}</div>
-                      <div>Enviado: {enviado.length}</div>
-                      <div>Respondido: {cell?.justificativas?.length}</div>
-                    </div>
-                  );
-                })
-              : null}
-          </RelatoryContainer>
-        </MainPageContainer>
+                return (
+                  <div key={index}>
+                    <div>{cell.turma}</div>
+                    <div>Total: {cell.alunos.length}</div>
+                    <div>Inválido: {invalido.length}</div>
+                    <div>Enviado: {enviado.length}</div>
+                    <div>Respondido: {cell?.justificativas?.length}</div>
+                  </div>
+                );
+              })
+            : null}
+        </RelatoryContainer>
         <Footer>
-          {}
-          <div>Total {sumariCount.total}</div>
-          <div>Enviado {sumariCount.enviado}</div>
-          <div>Fracassado {sumariCount.fracassado}</div>
-          <div>Invalido {sumariCount.invalido}</div>
-          <div>Respondido {sumariCount.respondido}</div>
+          <div className="list">
+            <SidePage>
+              {savedData.map((data, index) => {
+                return (
+                  <div
+                    className="card"
+                    key={index}
+                    onClick={() => {
+                      setSchollData(data.data);
+                    }}
+                  >
+                    <p>Tipo: {data.type}</p>
+                    <p>{dateTimeFormat1.format(new Date(data.date))}</p>
+                    <IoMdCloseCircle
+                      onClick={() => {
+                        const savedData = localStorage.getItem(
+                          "SavedSumaryData"
+                        )
+                          ? JSON.parse(localStorage.getItem("SavedSumaryData")!)
+                          : [];
+                        const newData = savedData.filter(
+                          (x: any, i: any) => i != index
+                        );
+                        localStorage.setItem(
+                          "SavedSumaryData",
+                          JSON.stringify(newData)
+                        );
+                        setSavedData(newData);
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </SidePage>
+          </div>
+          <div className="cell">
+            <p>Total</p>
+            <p>{sumariCount.total}</p>
+          </div>
+          <div className="cell">
+            <p>Enviado</p>
+            <p>{sumariCount.total}</p>
+          </div>
+          <div className="cell">
+            <p>Fracassado</p>
+            <p>{sumariCount.fracassado}</p>
+          </div>
+          <div className="cell">
+            <p>Invalido</p>
+            <p>{sumariCount.invalido}</p>
+          </div>
+          <div className="cell">
+            <p>Respondido</p>
+            <p>{sumariCount.respondido}</p>
+          </div>
         </Footer>
       </MainDiv>
     </>
