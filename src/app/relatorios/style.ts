@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const MainDiv = styled.div`
   width: 100%;
   background-color: #231f20;
-  padding-top: 40px;
+  padding-top: 80px;
   min-height: 100vh;
 
   * {
@@ -271,9 +271,25 @@ export const Footer = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    font-weight: 600;
     @media (max-width: 500px) {
       font-size: 12px;
     }
+  }
+  .cell:nth-child(2) {
+    background-color: #001219;
+  }
+  .cell:nth-child(3) {
+    background-color: #0a9396;
+  }
+  .cell:nth-child(4) {
+    background-color: #ae2012;
+  }
+  .cell:nth-child(5) {
+    background-color: #9b2226;
+  }
+  .cell:nth-child(6) {
+    background-color: #94d2bd;
   }
   .list {
     grid-column: span 5;

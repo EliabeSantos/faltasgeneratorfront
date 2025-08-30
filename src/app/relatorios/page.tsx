@@ -306,7 +306,7 @@ export default function Relatorios() {
           <NavContainer>
             <div>
               <Link href={"/"}>Alunos Faltantes</Link>
-              <Link href={"/relatorios/ajuda"}>Ajuda</Link>
+              <Link href={"/relatorios/ajuda-relatorios"}>Ajuda</Link>
             </div>
           </NavContainer>
         </ButtonsDiv>
