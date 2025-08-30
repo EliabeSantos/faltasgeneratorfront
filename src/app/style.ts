@@ -160,7 +160,7 @@ export const InputFileReceiver = styled.label`
 
 export const Container = styled.div`
   display: grid;
-  @media (max-width: 2000px) {
+  @media (max-width: 3000px) {
     grid-template-columns: repeat(4, 1fr) !important;
   }
   @media (max-width: 1420px) {
@@ -279,11 +279,15 @@ export const NavContainer = styled.div`
     grid-column: span 8;
     display: flex;
     flex-direction: row-reverse;
+    gap: 5px;
     > a {
       grid-column: span 1;
       border: 2px solid #ff9f1c;
       height: 100%;
       padding: 0 5px;
+    }
+    a:hover {
+      background-color: #ff9f1c;
     }
   }
   @media (max-width: 1980px) {
@@ -298,6 +302,31 @@ export const NavContainer = styled.div`
     grid-column: span 4;
     > div {
       grid-column: span 2;
+    }
+  }
+`;
+
+export const AcceptButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
+  &:hover {
+    cursor: pointer;
+    * {
+      color: green !important;
+    }
+  }
+`;
+export const RemoveButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 29px;
+  &:hover {
+    cursor: pointer;
+    * {
+      color: red !important;
     }
   }
 `;

@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { FaFileArrowUp, FaFileArrowDown, FaCopy } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
 import Link from "next/link";
+import { FaRegWindowClose } from "react-icons/fa";
+import { BsClipboardCheck } from "react-icons/bs";
+import { IoIosCloseCircleOutline } from "react-icons/io";
+
+import { GoIssueClosed } from "react-icons/go";
 import {
+  AcceptButton,
   AlunoDiv,
   ButtonsDiv,
   Container,
@@ -17,6 +23,7 @@ import {
   MainDiv,
   NameSearch,
   NavContainer,
+  RemoveButton,
   TurmaDiv,
 } from "./style";
 
@@ -30,6 +37,7 @@ export default function Home() {
   const [dontSendMessage, setDontSendMessage] = useState<Array<any>>([]);
   const [atestado, setAtestado] = useState<string>("");
   const [selectPeriod, setSelectedPeriod] = useState<string>("");
+  const [selectDate, setSelectedDate] = useState<string>("");
   const options: any = {
     year: "numeric",
     month: "numeric",
@@ -43,8 +51,9 @@ export default function Home() {
 
     rows.forEach(function (rowArray) {
       for (let i = 0; i < dontSendMessage.length; i++) {
+        console.log(dontSendMessage[i], dontSendMessage);
         if (
-          dontSendMessage[i][0].replace(/[^A-Za-z0-9]/g, "") ==
+          dontSendMessage[i][0]?.replace(/[^A-Za-z0-9]/g, "") ==
           rowArray[0].replace(/[^A-Za-z0-9]/g, "")
         ) {
           const atestadoDate = new Date(dontSendMessage[i][2]);
@@ -461,6 +470,8 @@ Colégio Estadual Leocádia Braga Ramos
             </button>
             <div>
               <Link href={"/relatorios"}>Relatorios</Link>
+
+              <Link href={"/ajuda"}>Ajuda</Link>
             </div>
           </NavContainer>
         </ButtonsDiv>
@@ -476,7 +487,7 @@ Colégio Estadual Leocádia Braga Ramos
                 return (
                   <TurmaDiv key={index}>
                     <h1>{Turma.curso}</h1>
-                    {Turma.alunos.map((Aluno: any, index: any) => {
+                    {Turma.alunos.map((Aluno: any, index2: any) => {
                       if (filterByName.length)
                         if (
                           !Aluno["__EMPTY_4"]
@@ -496,7 +507,7 @@ Colégio Estadual Leocádia Braga Ramos
                         <AlunoDiv
                           valid={Aluno.invalido ? "true" : "false"}
                           atestado={Aluno.atestado ? "true" : "false"}
-                          key={index}
+                          key={index2}
                         >
                           <div>
                             <p>{Aluno["__EMPTY_2"]}</p>
@@ -507,22 +518,10 @@ Colégio Estadual Leocádia Braga Ramos
                                 <input
                                   type="date"
                                   onChange={(e: any) => {
-                                    if (
-                                      !dontSendMessage.find((z) =>
-                                        z[1]?.includes(Aluno["__EMPTY_4"])
-                                      )
-                                    ) {
-                                      const newAtestado = [
-                                        ...dontSendMessage,
-                                        [...obj, e.target.value],
-                                      ];
-                                      localStorage.setItem(
-                                        "atestados",
-                                        JSON.stringify(newAtestado)
-                                      );
-                                      setDontSendMessage(newAtestado);
-                                    }
-                                    setAtestado("");
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log(e.target.value);
+                                    setSelectedDate(e.target.value);
                                   }}
                                 ></input>
                               </div>
@@ -531,43 +530,127 @@ Colégio Estadual Leocádia Braga Ramos
                             )}
                           </div>
                           <div className="edit">
-                            <div
+                            {atestado == Aluno["__EMPTY_4"] ? (
+                              <>
+                                <AcceptButton
+                                  onClick={(e: any) => {
+                                    e.preventDefault();
+                                    if (!selectDate.length) return;
+                                    const newList = FullList;
+
+                                    if (
+                                      !dontSendMessage.find((z) =>
+                                        z[1]?.includes(Aluno["__EMPTY_4"])
+                                      )
+                                    ) {
+                                      newList[index].alunos[
+                                        newList[index].alunos.findIndex(
+                                          (x: any) =>
+                                            x["__EMPTY_4"] == Aluno["__EMPTY_4"]
+                                        )
+                                      ].atestado = true;
+                                      const newAtestado = [
+                                        ...dontSendMessage,
+                                        [...obj, selectDate],
+                                      ];
+                                      localStorage.setItem(
+                                        "atestados",
+                                        JSON.stringify(newAtestado)
+                                      );
+                                      setDontSendMessage(newAtestado);
+                                    }
+                                    setFullList(newList);
+                                    setSelectedDate("");
+                                    setAtestado("");
+                                  }}
+                                >
+                                  <GoIssueClosed />
+                                </AcceptButton>
+                              </>
+                            ) : (
+                              <div
+                                onClick={(e: any) => {
+                                  e.preventDefault();
+                                  if (!atestado.length)
+                                    setAtestado(Aluno["__EMPTY_4"]);
+                                }}
+                              >
+                                <FaEdit />
+                              </div>
+                            )}
+                          </div>
+                          {atestado == Aluno["__EMPTY_4"] ? (
+                            <RemoveButton
                               onClick={(e: any) => {
                                 e.preventDefault();
-                                if (!atestado.length)
-                                  setAtestado(Aluno["__EMPTY_4"]);
-                                else setAtestado("");
+                                setAtestado("");
+                                console.log(dontSendMessage);
+                                const filteredDontSend = dontSendMessage.filter(
+                                  (x) => !x[1]?.includes(Aluno["__EMPTY_4"])
+                                );
+                                console.log(
+                                  filteredDontSend,
+                                  Aluno["__EMPTY_4"],
+                                  selectDate
+                                );
+                                if (
+                                  dontSendMessage.find((z) =>
+                                    z[1]?.includes(Aluno["__EMPTY_4"])
+                                  ) &&
+                                  selectDate == ""
+                                ) {
+                                  const newList = FullList;
+                                  newList[index].alunos[
+                                    newList[index].alunos.findIndex(
+                                      (x: any) =>
+                                        x["__EMPTY_4"] == Aluno["__EMPTY_4"]
+                                    )
+                                  ].atestado = false;
+                                  console.log(
+                                    "filteredDontSend",
+                                    filteredDontSend
+                                  );
+                                  setDontSendMessage([filteredDontSend]);
+                                  localStorage.setItem(
+                                    "atestados",
+                                    JSON.stringify(filteredDontSend)
+                                  );
+                                }
                               }}
                             >
-                              <FaEdit />
-                            </div>
-                          </div>
-                          <CustumizedInput
-                            type="checkbox"
-                            onChange={() => {
-                              if (
-                                !SelectedStudents.find((z) =>
+                              <IoIosCloseCircleOutline />
+                            </RemoveButton>
+                          ) : (
+                            <CustumizedInput
+                              type="checkbox"
+                              onChange={() => {
+                                if (
+                                  !SelectedStudents.find((z) =>
+                                    z[1]?.includes(Aluno["__EMPTY_4"])
+                                  )
+                                ) {
+                                  setSelectedStudents([
+                                    ...SelectedStudents,
+                                    obj,
+                                  ]);
+                                } else {
+                                  setSelectedStudents([
+                                    ...SelectedStudents.filter((x) => {
+                                      return x[1] != obj[1];
+                                    }),
+                                  ]);
+                                }
+                              }}
+                              value={Aluno["__EMPTY_4"]}
+                              checked={
+                                SelectedStudents.find((z) =>
                                   z[1]?.includes(Aluno["__EMPTY_4"])
                                 )
-                              ) {
-                                setSelectedStudents([...SelectedStudents, obj]);
-                              } else {
-                                setSelectedStudents([
-                                  ...SelectedStudents.filter((x) => {
-                                    return x[1] != obj[1];
-                                  }),
-                                ]);
+                                  ? true
+                                  : false
                               }
-                            }}
-                            value={Aluno["__EMPTY_4"]}
-                            checked={
-                              SelectedStudents.find((z) =>
-                                z[1]?.includes(Aluno["__EMPTY_4"])
-                              )
-                                ? true
-                                : false
-                            }
-                          />
+                            />
+                          )}
                         </AlunoDiv>
                       );
                     })}

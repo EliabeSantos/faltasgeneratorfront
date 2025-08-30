@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const MainDiv = styled.div`
   width: 100%;
   background-color: #231f20;
-  padding-top: 90px;
+  padding-top: 40px;
   min-height: 100vh;
 
   * {
@@ -11,8 +11,11 @@ export const MainDiv = styled.div`
   }
 
   position: relative;
-  @media (max-width: 700px) {
-    padding-top: 130px;
+  @media (max-width: 900px) {
+    padding-top: 115px;
+  }
+  @media (max-width: 500px) {
+    padding-top: 145px;
   }
 `;
 
@@ -278,5 +281,45 @@ export const Footer = styled.div`
     max-width: 100vw;
     overflow: auto;
     display: flex;
+  }
+`;
+export const NavContainer = styled.div`
+  width: 100%;
+  grid-column: span 10;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 5px;
+  > button {
+    grid-column: span 1;
+    border: 2px solid #ff9f1c;
+  }
+  > div {
+    grid-column: span 8;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 5px;
+    > a {
+      grid-column: span 1;
+      border: 2px solid #ff9f1c;
+      height: 100%;
+      padding: 0 5px;
+    }
+    a:hover {
+      background-color: #ff9f1c;
+    }
+  }
+  @media (max-width: 1980px) {
+    grid-template-columns: repeat(8, 1fr) !important;
+    grid-column: span 8;
+    > div {
+      grid-column: span 8;
+    }
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-column: span 4;
+    > div {
+      grid-column: span 2;
+    }
   }
 `;

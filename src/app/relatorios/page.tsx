@@ -12,9 +12,10 @@ import {
   RelatoryContainer,
   Footer,
   InputsContainer,
-  MainPageContainer,
   SidePage,
+  NavContainer,
 } from "./style";
+import Link from "next/link";
 interface data {
   total: number;
   enviado: number;
@@ -302,6 +303,12 @@ export default function Relatorios() {
             <p>Gerar Relatorio</p>
             <FaFileArrowDown />
           </DownloadButton>
+          <NavContainer>
+            <div>
+              <Link href={"/"}>Alunos Faltantes</Link>
+              <Link href={"/relatorios/ajuda"}>Ajuda</Link>
+            </div>
+          </NavContainer>
         </ButtonsDiv>
         <RelatoryContainer>
           {schollData
