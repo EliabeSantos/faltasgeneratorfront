@@ -92,7 +92,7 @@ export default function Relatorios() {
   }, [schollData]);
 
   useEffect(() => {
-    localStorage.getItem("SavedSumaryData")
+    localStorage.getItem("SavedSumaryData")!
       ? setSavedData(JSON.parse(localStorage.getItem("SavedSumaryData")!))
       : null;
   }, []);
