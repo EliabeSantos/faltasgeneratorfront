@@ -43,7 +43,7 @@ export default function Home() {
     month: "numeric",
     day: "numeric",
   };
-  const dateTimeFormat1 = new Intl.DateTimeFormat("pt-br", options);
+  // const dateTimeFormat1 = new Intl.DateTimeFormat("pt-br", options);
   const downloadCsv = async () => {
     const rows = SelectedStudents;
 
@@ -78,10 +78,7 @@ export default function Home() {
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     const today = new Date();
-    link.setAttribute(
-      "download",
-      "Alunos Faltantes" + dateTimeFormat1.format(today)
-    );
+    link.setAttribute("download", "Alunos Faltantes" + today);
     document.body.appendChild(link);
     link.click();
   };
